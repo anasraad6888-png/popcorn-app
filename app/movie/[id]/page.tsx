@@ -97,7 +97,7 @@ const WatchPage = () => {
         // جلب التريلر
         const searchName = data.title || data.name || "";
         movieTrailer(searchName, { id: true, multi: false } as any)
-          .then((res) => setTrailerUrl(res))
+          .then((res: any) => setTrailerUrl(res))
           .catch(() => console.log("Trailer not found"));
 
       } catch (error) {
