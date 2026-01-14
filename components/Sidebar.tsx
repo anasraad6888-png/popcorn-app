@@ -19,7 +19,7 @@ const Sidebar = () => {
   ];
 const router = useRouter(); // لاستخدام التوجيه
 // 1. حالة لتخزين هل يوجد مستخدم أم لا
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<any>(null);
 
   // 2. التحقق عند تحميل القائمة الجانبية
   useEffect(() => {
