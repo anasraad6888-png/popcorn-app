@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Cairo } from "next/font/google";
 import "./globals.css";
-import Navbar from "../components/Navbar"; // 1. استيراد الناف بار (لاحظ النقطتين للرجوع للخلف)
-
-const inter = Inter({ subsets: ["latin"] });
+import Sidebar from "@/components/Sidebar";
+import Navbar from "@/components/Navbar";
+const cairo = Cairo({ subsets: ["arabic"] });
 
 export const metadata: Metadata = {
-  title: "My Movie App",
-  description: "Best Movie App",
+  title: "PopCorn",
+  description: "By Anas",
 };
 
 export default function RootLayout({
@@ -17,10 +17,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ar" dir="rtl">
-      {/* 2. أضفنا bg-black لضمان الخلفية السوداء وتثبيت الناف بار */}
-      <body className={`${inter.className} bg-black text-white antialiased`}>
-        <Navbar /> 
-        {children}
+      {/* 1. أضفنا flex لجعل العناصر بجانب بعضها */}
+      <body className={`${cairo.className} flex bg-[#141414] min-h-screen`}>
+        
+        {/* القائمة الجانبية (ستكون على اليمين تلقائياً بسبب RTL) */}
+        <Sidebar />
+        
+        {/* 2. المحتوى الرئيسي: يأخذ باقي المساحة المتاحة (flex-1) */}
+        <main className="flex-1 w-full relative">
+          <Navbar />
+            {children}
+        </main>
+        
       </body>
     </html>
   );

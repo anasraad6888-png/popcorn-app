@@ -18,7 +18,7 @@ export default function Home() {
       <Hero />
       
       {/* مساحة تجريبية بالأسفل لنرى التمرير */}
-<div className="flex flex-col gap-8 -mt-32 relative z-20 pb-10">
+<div className="flex flex-col gap-8 mt-4 md:mt-10 pb-20 px-4 md:px-8 bg-[#141414]">
         <Row title="الأكثر مشاهدة هذا الأسبوع 🔥" fetchUrl={requests.fetchTrending} />
         <Row title="الأعلى تقييماً ⭐" fetchUrl={requests.fetchTopRated} />
         <Row title="أفلام الأكشن ⚔️" fetchUrl={requests.fetchActionMovies} />
