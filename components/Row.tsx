@@ -39,7 +39,7 @@ const Row = ({ title, fetchUrl, isLargeRow = false }: RowProps) => {
   }, [fetchUrl]);
 
   return (
-    <div className="py-6 pl-4 md:pl-8 border-b border-gray-900/50 last:border-0">
+    <div className="py-1 pl-4 md:pl-8 border-b border-gray-900/50 last:border-0">
       
       {/* عنوان القسم مع شريط جانبي جمالي */}
       <h2 className="text-xl md:text-2xl font-bold text-white mb-6 flex items-center gap-3 group cursor-pointer">
@@ -56,7 +56,7 @@ const Row = ({ title, fetchUrl, isLargeRow = false }: RowProps) => {
       </h2>
       
       {/* حاوية الكروت مع مساحة (padding) للحركة */}
-      <div className="flex items-center gap-4 overflow-x-scroll scrollbar-hide scroll-smooth pb-12 pt-2 px-2">
+      <div className="flex items-center gap-4 overflow-x-scroll scrollbar-hide scroll-smooth pb-12 pt-6 px-2">
         {movies.map((movie) => (
           (movie.poster_path || movie.backdrop_path) && (
             <Link key={movie.id} href={`/movie/${movie.id}`}>
