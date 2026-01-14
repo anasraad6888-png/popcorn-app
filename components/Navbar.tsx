@@ -94,8 +94,7 @@ useEffect(() => {
   };
 
   return (
-    <nav className={`fixed top-0 left-0 right-20 w-[calc(100%-5rem)] p-4 md:px-8 z-50 transition-all duration-300 ${show ? 'bg-[#141414]' : 'bg-gradient-to-b from-black/80 to-transparent'}`}>
-      <div className="flex items-center justify-between gap-4">
+<nav className={`fixed top-0 left-0 right-0 md:right-20 w-full md:w-[calc(100%-5rem)] p-4 md:px-8 z-40 transition-all duration-300 ${show ? 'bg-[#141414]' : 'bg-gradient-to-b from-black/80 to-transparent'}`}>      <div className="flex items-center justify-between gap-4">
         
         <div className="flex items-center gap-8">
 <Link href="/">

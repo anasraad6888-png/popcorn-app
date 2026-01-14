@@ -115,25 +115,29 @@ const Hero = () => {
         </p>
         
         {/* الأزرار */}
-        <div className="flex gap-4">
-        <Link href={`/watch/${movie.id}`}>
-          {/* زر التشغيل (الأصفر) */}
-          <button className="flex items-center gap-3 px-8 py-3 bg-[#FFD700] hover:bg-[#FFC000] text-black font-bold rounded-lg transition-all duration-300 transform hover:scale-105 shadow-[0_0_20px_rgba(255,215,0,0.4)]">
-             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-                <path fillRule="evenodd" d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653Z" clipRule="evenodd" />
-             </svg>
-             تشغيل الآن
-          </button>
+{/* الأزرار */}
+        <div className="flex gap-3 md:gap-4 mt-4 md:mt-0">
+          
+          {/* زر التشغيل */}
+          <Link href={`/watch/${movie.id}`}>
+            <button className="flex items-center gap-2 md:gap-3 px-5 py-2 md:px-8 md:py-3 bg-[#FFD700] hover:bg-[#FFC000] text-black font-bold text-sm md:text-base rounded-lg transition-all duration-300 transform hover:scale-105 shadow-[0_0_20px_rgba(255,215,0,0.4)]">
+               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 md:w-6 md:h-6">
+                  <path fillRule="evenodd" d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653Z" clipRule="evenodd" />
+               </svg>
+               تشغيل الآن
+            </button>
           </Link>
-<Link href={`/watch/${movie.id}`}>
-          {/* زر المزيد (الزجاجي) */}
-          <button className="flex items-center gap-3 px-8 py-3 bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/30 text-white font-bold rounded-lg transition-all duration-300 hover:scale-105">
-             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
-                <path strokeLinecap="round" strokeLinejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
-             </svg>
-             معلومات إضافية
-          </button>
-</Link>
+
+          {/* زر المزيد */}
+          <Link href={`/watch/${movie.id}`}>
+            <button className="flex items-center gap-2 md:gap-3 px-5 py-2 md:px-8 md:py-3 bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/30 text-white font-bold text-sm md:text-base rounded-lg transition-all duration-300 hover:scale-105">
+               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 md:w-6 md:h-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+               </svg>
+               معلومات
+            </button>
+          </Link>
+
         </div>
       </div>
 

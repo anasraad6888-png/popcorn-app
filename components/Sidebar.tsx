@@ -42,23 +42,29 @@ const router = useRouter(); // لاستخدام التوجيه
       console.error("فشل تسجيل الخروج", error);
     }
   };
-  return (
-    // الحاوية الرئيسية: عرض ثابت، فليكس لتوزيع العناصر (فوق وتحت)
-    <div className="sticky top-0 h-screen w-20 bg-[#0c0c0c] border-l border-gray-800 flex flex-col justify-between py-10 z-50 shrink-0">
+return (
+    // الحاوية الرئيسية
+    // الموبايل: fixed bottom-0 (ثابت بالأسفل)، w-full (عرض كامل)، h-16 (ارتفاع صغير)، flex-row (أفقي)
+    // الحاسبة (md): sticky top-0 (ثابت بالأعلى)، h-screen (طول الشاشة)، w-20 (عرض ثابت)، flex-col (عمودي)
+    <div className="fixed bottom-0 left-0 right-0 z-50 w-full h-16 bg-[#0c0c0c] border-t border-gray-800 flex flex-row justify-around items-center py-0
+                    md:sticky md:top-0 md:h-screen md:w-20 md:flex-col md:justify-between md:border-t-0 md:border-l md:py-10">
       
       {/* 1. القائمة العلوية */}
-      <div className="flex flex-col gap-6 items-center w-full">
+      <div className="flex flex-row w-full justify-around items-center md:flex-col md:gap-6">
         {menuItems.map((item, index) => (
-          <Link href={item.link} key={index} className="relative group w-full flex justify-center">
+          <Link href={item.link} key={index} className="relative group w-auto md:w-full flex justify-center">
             
             {/* الأيقونة */}
-            <div className="p-3 rounded-xl text-gray-400 group-hover:text-white group-hover:bg-gray-800 transition-all duration-300">
-              {item.icon}
+            <div className="p-2 md:p-3 rounded-xl text-gray-400 group-hover:text-white group-hover:bg-gray-800 transition-all duration-300">
+              {/* التحكم في حجم الأيقونة: أصغر في الموبايل (w-6) وأكبر في الحاسبة (md:w-7) */}
+              <div className="[&>svg]:w-6 [&>svg]:h-6 md:[&>svg]:w-7 md:[&>svg]:h-7">
+                {item.icon}
+              </div>
             </div>
 
-            <span className="absolute right-[120%] top-1/2 -translate-y-1/2 bg-white text-black text-xs font-bold px-3 py-1.5 rounded opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0 shadow-[0_0_10px_rgba(255,255,255,0.3)] whitespace-nowrap pointer-events-none z-50">
+            {/* التلميح (Tooltip): مخفي في الموبايل (hidden)، يظهر في الحاسبة (md:block) */}
+            <span className="hidden md:block absolute right-[120%] top-1/2 -translate-y-1/2 bg-white text-black text-xs font-bold px-3 py-1.5 rounded opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0 shadow-[0_0_10px_rgba(255,255,255,0.3)] whitespace-nowrap pointer-events-none z-50">
               {item.name}
-              {/* سهم صغير يشير للأيقونة */}
               <span className="absolute top-1/2 -right-1 -translate-y-1/2 border-4 border-transparent border-l-white"></span>
             </span>
 
@@ -66,24 +72,20 @@ const router = useRouter(); // لاستخدام التوجيه
         ))}
       </div>
 
-{/* 2. زر تسجيل الخروج */}
-      <div className="flex flex-col items-center w-full border-t border-gray-800 pt-6">
+      {/* 2. زر تسجيل الخروج */}
+      {/* مخفي في الموبايل (hidden) لتوفير المساحة، يظهر في الحاسبة (md:flex) */}
+      <div className="hidden md:flex flex-col items-center w-full border-t border-gray-800 pt-6">
          
          <button 
-            // تفعيل الزر فقط إذا كان هناك مستخدم
             onClick={user ? handleLogout : undefined}
             disabled={!user} 
-            
-            // تغيير الستايل: إذا لم يوجد مستخدم قلل الشفافية وامنع المؤشر
             className={`relative group w-full flex justify-center transition-all duration-300 ${!user ? 'opacity-30 cursor-not-allowed' : ''}`}
          >
             
-            {/* الأيقونة: حمراء عند التفعيل، ورمادية عند التعطيل */}
             <div className={`p-3 rounded-xl transition-all duration-300 ${user ? 'text-red-600 hover:bg-red-600/10' : 'text-gray-500'}`}>
               <LogoutIcon />
             </div>
 
-            {/* التلميح (Tooltip): يظهر فقط إذا كان الزر مفعلاً */}
             {user && (
                 <span className="absolute right-[120%] top-1/2 -translate-y-1/2 bg-red-600 text-white text-xs font-bold px-3 py-1.5 rounded opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0 shadow-[0_0_10px_rgba(220,38,38,0.5)] whitespace-nowrap pointer-events-none z-50">
                   تسجيل الخروج
