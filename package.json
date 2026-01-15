@@ -13,6 +13,7 @@
     "firebase": "^12.7.0",
     "movie-trailer": "^3.2.2",
     "next": "16.1.1",
+    "next-intl": "^4.7.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-icon": "^1.0.0",

@@ -47,7 +47,7 @@ const SearchPage = () => {
           {movies.map((movie) => (
             movie.poster_path && (
               // 👈 هنا التغيير: غلفنا الصورة برابط ينقل لصفحة الفيلم
-              <Link key={movie.id} href={`/movie/${movie.id}`}>
+              <Link key={movie.id} href={`/watch/${movie.id}`}>
                 <div className="relative group cursor-pointer hover:scale-105 transition duration-300">
                     <img
                         src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}

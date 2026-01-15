@@ -1,0 +1,85 @@
+{
+  "Navbar": {
+    "home": "Home",
+    "movies": "Movies",
+    "series": "TV Series",
+    "search_placeholder": "Search movies or series...",
+    "login": "Sign In",
+    "welcome": "Hello,",
+    "no_results": "No results found",
+    "searching": "Searching...",
+    "logo":"logo-en.png"
+  },
+  "Hero": {
+    "play": "Play Now",
+    "more_info": "More Info",
+    "imdb": "IMDb",
+    "year": "Year"
+  },
+  "Rows": {
+    "trending": "Trending Now",
+    "top_rated": "Top Rated",
+    "action": "Action Movies",
+    "comedy": "Comedy Movies",
+    "horror": "Horror Movies",
+    "romance": "Romance Movies",
+    "documentaries": "Documentaries",
+    "browse_all": "Browse All"
+  },
+"Watch": {
+    "story": "Storyline",
+    "cast": "Cast",
+    "watch_movie": "Watch Movie",
+    "add_to_list": "My List",
+    "in_list": "Added",
+    "similar": "Similar Movies",
+    "recommended": "Recommended",
+    "season": "Season",
+    "episode": "Episode",
+    "choose_episode": "Choose Episode",
+    "no_desc": "No description available.",
+    "no_cast": "No cast information available."
+  },
+  "Sidebar": {
+    "home": "Home",
+    "trending": "Trending",
+    "movies": "Movies",
+    "series": "TV Series",
+    "anime": "Anime",
+    "favorites": "My List",
+    "settings": "Settings",
+    "logout": "Log Out"
+  },
+  "Favorites": {
+    "title": "My List",
+    "works_count": "items",
+    "login_required": "You must log in to view your list",
+    "login_button": "Sign In",
+    "empty_list": "You haven't added any movies or series yet.",
+    "browse_now": "Browse Movies Now",
+    "play": "Play",
+    "remove_title": "Remove from list",
+    "remove_confirm": "Are you sure you want to remove this item?",
+    "remove_error": "Error removing item"
+  },
+  "Login": {
+    "title": "Sign In",
+    "email_placeholder": "Email Address",
+    "password_placeholder": "Password",
+    "submit_button": "Sign In",
+    "or_continue": "Or continue with",
+    "new_user": "New to PopCorn?",
+    "signup_link": "Sign up now",
+    "login_error": "Login error: "
+  },
+  "Signup": {
+    "title": "Create Account",
+    "name_placeholder": "Full Name",
+    "email_placeholder": "Email Address",
+    "password_placeholder": "Password",
+    "submit_button": "Sign Up",
+    "existing_user": "Already have an account?",
+    "login_link": "Sign In",
+    "signup_error": "Signup Error: "
+  }
+}

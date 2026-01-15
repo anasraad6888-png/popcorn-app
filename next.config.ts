@@ -1,7 +1,11 @@
-import type { NextConfig } from "next";
+import createNextIntlPlugin from 'next-intl/plugin';
+import type { NextConfig } from 'next'; // استيراد النوع
 
-const nextConfig: NextConfig = {
-  /* config options here */
+const withNextIntl = createNextIntlPlugin('./i18n.ts');
+const nextConfig: NextConfig = { // تحديد النوع هنا
+    images: {
+        domains: ['image.tmdb.org', 'upload.wikimedia.org', 'cloud.appwrite.io']
+    }
 };
 
-export default nextConfig;
+export default withNextIntl(nextConfig);

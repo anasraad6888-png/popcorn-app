@@ -1,0 +1,86 @@
+{
+  "Navbar": {
+    "home": "الرئيسية",
+    "movies": "أفلام",
+    "series": "مسلسلات",
+    "search_placeholder": "ابحث عن فيلم أو مسلسل...",
+    "login": "تسجيل الدخول",
+    "welcome": "مرحباً،",
+    "no_results": "لا توجد نتائج",
+    "searching": "جاري البحث...",
+    "logo":"logo-ar.png"
+    
+  },
+  "Hero": {
+    "play": "تشغيل الآن",
+    "more_info": "معلومات إضافية",
+    "imdb": "IMDb",
+    "year": "سنة"
+  },
+  "Rows": {
+    "trending": "الأكثر مشاهدة هذا الأسبوع",
+    "top_rated": "الأعلى تقييماً",
+    "action": "أفلام الأكشن",
+    "comedy": "كوميديا",
+    "horror": "رعب",
+    "romance": "رومانسية",
+    "documentaries": "وثائقيات",
+    "browse_all": "تصفح الكل"
+  },
+  "Watch": {
+    "story": "قصة العمل",
+    "cast": "طاقم التمثيل",
+    "watch_movie": "مشاهدة الفيلم",
+    "add_to_list": "قائمتي",
+    "in_list": "في قائمتي",
+    "similar": "أعمال مشابهة",
+    "recommended": "موصى به",
+    "season": "الموسم",
+    "episode": "حلقة",
+    "choose_episode": "اختر الحلقة",
+    "no_desc": "لا يوجد وصف متاح لهذا العمل.",
+    "no_cast": "لا تتوفر معلومات عن الممثلين."
+  },
+  "Sidebar": {
+    "home": "الرئيسية",
+    "trending": "الأكثر مشاهدة",
+    "movies": "أفلام",
+    "series": "مسلسلات",
+    "anime": "أنمي",
+    "favorites": "المفضلة",
+    "settings": "الإعدادات",
+    "logout": "تسجيل الخروج"
+  },
+  "Favorites": {
+    "title": "قائمتي",
+    "works_count": "أعمال",
+    "login_required": "يجب تسجيل الدخول لعرض القائمة",
+    "login_button": "تسجيل الدخول",
+    "empty_list": "لم تضف أي أفلام أو مسلسلات للقائمة بعد.",
+    "browse_now": "تصفح الأفلام الآن",
+    "play": "تشغيل",
+    "remove_title": "حذف من القائمة",
+    "remove_confirm": "هل أنت متأكد من الحذف من القائمة؟",
+    "remove_error": "حدث خطأ أثناء الحذف"
+  },
+  "Login": {
+    "title": "تسجيل الدخول",
+    "email_placeholder": "البريد الإلكتروني",
+    "password_placeholder": "كلمة المرور",
+    "submit_button": "تسجيل الدخول",
+    "or_continue": "أو تابع باستخدام",
+    "new_user": "جديد في الموقع؟",
+    "signup_link": "سجل الآن",
+    "login_error": "خطأ في الدخول: "
+  },
+  "Signup": {
+    "title": "إنشاء حساب جديد",
+    "name_placeholder": "الاسم الكامل",
+    "email_placeholder": "البريد الإلكتروني",
+    "password_placeholder": "كلمة المرور",
+    "submit_button": "إنشاء الحساب",
+    "existing_user": "لديك حساب بالفعل؟",
+    "login_link": "تسجيل الدخول",
+    "signup_error": "خطأ في إنشاء الحساب: "
+  }
+}
