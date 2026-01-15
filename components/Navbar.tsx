@@ -94,15 +94,28 @@ const Navbar = () => {
     <nav className={`fixed top-0 start-0 w-full z-40 transition-all duration-300 p-4 md:py-4 md:ps-20 md:pe-8 ${show ? 'bg-[#141414]' : 'bg-gradient-to-b from-black/80 to-transparent'}`}>
       <div className="flex items-center justify-between gap-4">
         
-        {/* اللوجو والقوائم */}
+{/* اللوجو والقوائم */}
         <div className="flex items-center gap-8">
             <Link href="/">
+                
+                {/* 1. لوجو الموبايل (الأيقونة فقط) */}
+                {/* يظهر في الشاشات الصغيرة (block) ويختفي في المتوسطة فما فوق (md:hidden) */}
+                <img 
+                    src={t('logo_mobile')} // أو ضع المسار مباشرة "/logo-icon.png"
+                    alt="PopCorn" 
+                    className="block md:hidden w-10 h-10 object-contain cursor-pointer hover:scale-105 transition-transform duration-200" 
+                />
+
+                {/* 2. لوجو الكمبيوتر (النص الكامل) */}
+                {/* يختفي في الشاشات الصغيرة (hidden) ويظهر في المتوسطة فما فوق (md:block) */}
                 <img 
                     src={t('logo')} 
                     alt="PopCorn" 
-                    className="w-24 md:w-32 h-auto object-contain cursor-pointer hover:scale-105 transition-transform duration-200" 
+                    className="hidden md:block w-24 md:w-32 h-auto object-contain cursor-pointer hover:scale-105 transition-transform duration-200" 
                 />
+
             </Link>
+            
             <ul className="hidden md:flex gap-6 text-gray-300 text-sm font-medium">
                 <Link href="/"><li className="hover:text-[#FFD700] cursor-pointer transition">{t('home')}</li></Link>
                 <li className="hover:text-[#FFD700] cursor-pointer transition">{t('movies')}</li>
@@ -190,13 +203,6 @@ const Navbar = () => {
             </Link>
             )}
 
-            <div className="w-9 h-9 rounded bg-[#FFD700] flex items-center justify-center cursor-pointer border border-transparent hover:border-white transition overflow-hidden">
-                {user ? (
-                     <div className="text-black font-bold text-lg">{user.name.charAt(0).toUpperCase()}</div>
-                ) : (
-                     <img src="https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png" className="w-full h-full object-cover" />
-                )}
-            </div>
         </div>
 
       </div>

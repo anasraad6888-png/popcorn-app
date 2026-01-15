@@ -8,7 +8,8 @@
     "welcome": "Hello,",
     "no_results": "No results found",
     "searching": "Searching...",
-    "logo":"logo-en.png"
+    "logo":"logo-en.png",
+    "logo_mobile": "/logo-icon.png"
   },
   "Hero": {
     "play": "Play Now",
@@ -70,7 +71,16 @@
     "or_continue": "Or continue with",
     "new_user": "New to PopCorn?",
     "signup_link": "Sign up now",
-    "login_error": "Login error: "
+    "login_error": "Login error: ",
+    "forgot_password": "Forgot Password?",
+    "recovery_sent": "Recovery email sent! Check your inbox. 📧",
+    "errors": {
+      "invalid_credentials": "Invalid email or password",
+      "password_short": "Password must be at least 8 characters long",
+      "email_invalid": "Please enter a valid email address",
+      "email_required_recovery": "Please enter your email above first",
+      "general_error": "An unexpected error occurred"
+    }
   },
   "Signup": {
     "title": "Create Account",
@@ -80,6 +90,23 @@
     "submit_button": "Sign Up",
     "existing_user": "Already have an account?",
     "login_link": "Sign In",
-    "signup_error": "Signup Error: "
+    "signup_error": "Signup Error: ",
+    "errors": {
+      "name_invalid": "Name must contain at least one character",
+      "email_invalid": "Please enter a valid email address",
+      "password_short": "Password must be at least 8 characters long",
+      "user_exists": "A user with this email already exists",
+      "general_error": "An unexpected error occurred"
+    }
+  },
+  "ResetPassword": {
+    "title": "Reset New Password",
+    "new_password_placeholder": "New Password",
+    "confirm_password_placeholder": "Confirm Password",
+    "submit_button": "Change Password",
+    "success_msg": "Password changed successfully! Redirecting to login...",
+    "error_mismatch": "Passwords do not match",
+    "error_missing_params": "Invalid link (missing parameters)",
+    "general_error": "Error changing password"
   }
 }

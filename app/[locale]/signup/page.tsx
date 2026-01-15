@@ -11,15 +11,13 @@ export default function SignupPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  
-  // 1. حالة جديدة لتخزين الخطأ
   const [error, setError] = useState(''); 
   
   const router = useRouter();
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(''); // مسح أي خطأ سابق عند المحاولة الجديدة
+    setError(''); 
 
     try {
       await account.create(ID.unique(), email, password, name);
@@ -27,9 +25,30 @@ export default function SignupPage() {
       window.location.href = '/';
       
     } catch (err: any) {
-      // 2. بدلاً من alert، نضع الرسالة في الـ State
-      // قمنا بإزالة البادئة التقنية لجعل الرسالة أوضح
-      setError(err.message);
+      const rawMessage = err.message || ""; // النص الأصلي للخطأ
+
+      // منطق تحويل الخطأ التقني إلى رسالة ودية
+      if (rawMessage.includes("password")) {
+        // إذا كان الخطأ يخص كلمة المرور
+        setError(t('errors.password_short'));
+      
+      } else if (rawMessage.includes("valid email") || rawMessage.includes("Invalid `email`")) {
+        // إذا كان الخطأ يخص الإيميل
+        setError(t('errors.email_invalid'));
+      
+      } else if (rawMessage.includes("name") || rawMessage.includes("Invalid `name`")) {
+        // إذا كان الخطأ يخص الاسم
+        setError(t('errors.name_invalid'));
+      
+      } else if (rawMessage.includes("already exists") || err.code === 409) {
+        // إذا كان المستخدم موجوداً مسبقاً (كود 409 يعني تضارب)
+        setError(t('errors.user_exists'));
+      
+      } else {
+        // أي خطأ آخر غير متوقع
+        setError(t('errors.general_error'));
+        console.error(rawMessage); // طباعة الخطأ الأصلي للمطور فقط
+      }
     }
   };
 
@@ -64,10 +83,13 @@ export default function SignupPage() {
             className="w-full bg-[#333] text-white px-5 py-4 rounded-lg outline-none focus:bg-[#454545] border-b-2 border-transparent focus:border-[#d3e509] transition-all placeholder-gray-400"
           />
 
-          {/* 3. مكان ظهور رسالة الخطأ */}
+          {/* ظهور رسالة الخطأ المترجمة والمختصرة */}
           {error && (
-            <div className="text-red-500 text-sm font-bold bg-red-500/10 p-3 rounded border border-red-500/20 text-start animate-pulse">
-               ⚠️ {t('signup_error')} {error}
+            <div className="text-red-500 text-sm font-bold bg-red-500/10 p-3 rounded border border-red-500/20 text-start animate-pulse flex items-center gap-2">
+               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 shrink-0">
+                 <path fillRule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003ZM12 8.25a.75.75 0 0 1 .75.75v3.75a.75.75 0 0 1-1.5 0V9a.75.75 0 0 1 .75-.75Zm0 8.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clipRule="evenodd" />
+               </svg>
+               {error}
             </div>
           )}
 

@@ -1,27 +1,76 @@
 "use client";
 
-import { account } from '@/app/appwrite'; // تأكد من المسار الصحيح
+import { account } from '@/app/appwrite';
 import { OAuthProvider } from 'appwrite'; 
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FaGoogle } from 'react-icons/fa';
-import { useTranslations } from 'next-intl'; // 1. استيراد هوك الترجمة
+import { useTranslations } from 'next-intl';
 
 export default function LoginPage() {
-  const t = useTranslations('Login'); // 2. تفعيل الترجمة
+  const t = useTranslations('Login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  
+  // حالات الخطأ والنجاح
+  const [error, setError] = useState('');
+  const [successMsg, setSuccessMsg] = useState(''); // رسالة نجاح الإرسال
+  
   const router = useRouter();
 
-  // دالة الدخول بالإيميل
+  // دالة تسجيل الدخول
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(''); 
+    setSuccessMsg('');
+
     try {
       await account.createEmailPasswordSession(email, password);
       window.location.href = '/'; 
-    } catch (error: any) {
-      alert(t('login_error') + error.message);
+    } catch (err: any) {
+      const rawMessage = err.message || ""; 
+
+      if (rawMessage.includes("Invalid credentials") || rawMessage.includes("401")) {
+        setError(t('errors.invalid_credentials'));
+      } else if (
+          rawMessage.includes("password") && 
+          (rawMessage.includes("between 8 and 256") || rawMessage.includes("Invalid `password` param"))
+      ) {
+        setError(t('errors.password_short'));
+      } else if (
+          rawMessage.includes("email") || rawMessage.includes("Invalid `email` param")
+      ) {
+        setError(t('errors.email_invalid'));
+      } else {
+        setError(t('errors.general_error'));
+        console.error(rawMessage); 
+      }
+    }
+  };
+
+  // 👇 دالة استعادة كلمة المرور الجديدة
+  const handleRecovery = async () => {
+    setError('');
+    setSuccessMsg('');
+
+    // 1. يجب أن يكون الإيميل مكتوباً
+    if (!email) {
+        setError(t('errors.email_required_recovery'));
+        return;
+    }
+
+    try {
+        // 2. إرسال طلب الاستعادة لـ Appwrite
+        // ملاحظة: الرابط الثاني هو الصفحة التي سيتوجه لها المستخدم عند ضغط الرابط في الإيميل
+        // سنفترض حالياً أنها الصفحة الرئيسية حتى تقوم بإنشاء صفحة خاصة للاستعادة
+        await account.createRecovery(email, 'http://localhost:3000/reset-password'); 
+        
+        // 3. إظهار رسالة نجاح
+        setSuccessMsg(t('recovery_sent'));
+    } catch (err: any) {
+        // التعامل مع الأخطاء (مثل الإيميل غير صحيح)
+        setError(err.message); 
     }
   };
 
@@ -30,7 +79,7 @@ export default function LoginPage() {
     try {
       account.createOAuth2Session(
           OAuthProvider.Google,
-          'http://localhost:3000', // تم تعديل المنفذ ليكون 3000 (Next.js default)
+          'http://localhost:3000', 
           'http://localhost:3000/login'
       );
     } catch (error) {
@@ -44,24 +93,48 @@ export default function LoginPage() {
       
       <div className="relative z-10 bg-black/75 backdrop-blur-md border border-white/10 p-8 md:p-12 rounded-xl shadow-2xl w-full max-w-md mx-4">
         
-        {/* العنوان */}
         <h2 className="text-3xl font-bold text-white mb-8 text-start">{t('title')}</h2>
 
         <form onSubmit={handleLogin} className="flex flex-col gap-5">
           <input 
             onChange={(e) => setEmail(e.target.value)}
             type="email" 
-            placeholder={t('email_placeholder')} // ترجمة البليس هولدر
+            placeholder={t('email_placeholder')}
             className="w-full bg-[#333] text-white px-5 py-4 rounded-lg outline-none focus:bg-[#454545] border-b-2 border-transparent focus:border-[#d3e509] transition-all placeholder-gray-400"
           />
-          <input 
-            onChange={(e) => setPassword(e.target.value)}
-            type="password" 
-            placeholder={t('password_placeholder')} // ترجمة البليس هولدر
-            className="w-full bg-[#333] text-white px-5 py-4 rounded-lg outline-none focus:bg-[#454545] border-b-2 border-transparent focus:border-[#d3e509] transition-all placeholder-gray-400"
-          />
+          
+          <div className="flex flex-col gap-2">
+            <input 
+                onChange={(e) => setPassword(e.target.value)}
+                type="password" 
+                placeholder={t('password_placeholder')}
+                className="w-full bg-[#333] text-white px-5 py-4 rounded-lg outline-none focus:bg-[#454545] border-b-2 border-transparent focus:border-[#d3e509] transition-all placeholder-gray-400"
+            />
+            {/* 👇 زر نسيان كلمة المرور */}
+            <button 
+                type="button" 
+                onClick={handleRecovery}
+                className="text-xs text-gray-400 hover:text-white hover:underline text-end transition-colors w-fit self-end"
+            >
+                {t('forgot_password')}
+            </button>
+          </div>
 
-          <button type="submit" className="bg-[#FFD700] hover:bg-[#FFC000] text-black font-bold py-3.5 rounded-lg mt-4 
+          {/* عرض رسالة الخطأ */}
+          {error && (
+            <div className="text-red-500 text-sm font-bold bg-red-500/10 p-3 rounded border border-red-500/20 text-start animate-pulse flex items-center gap-2">
+               ⚠️ {error}
+            </div>
+          )}
+
+          {/* عرض رسالة النجاح (للإيميل) */}
+          {successMsg && (
+            <div className="text-green-500 text-sm font-bold bg-green-500/10 p-3 rounded border border-green-500/20 text-start animate-pulse flex items-center gap-2">
+               ✅ {successMsg}
+            </div>
+          )}
+
+          <button type="submit" className="bg-[#FFD700] hover:bg-[#FFC000] text-black font-bold py-3.5 rounded-lg mt-2 
             transition-all duration-300 shadow-[0_0_15px_rgba(255,215,0,0.5)] hover:shadow-[0_0_25px_rgba(255,215,0,0.7)]">
             {t('submit_button')}
           </button>
