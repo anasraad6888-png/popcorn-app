@@ -42,7 +42,7 @@ export default function ResetPasswordPage() {
         userId, 
         secret, 
         password, 
-        confirmPassword 
+       
       );
       
       setSuccess(t('success_msg'));
