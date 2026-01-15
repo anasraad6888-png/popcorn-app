@@ -111,7 +111,7 @@ const Navbar = () => {
         </div>
 
         {/* البحث */}
-        <div className="relative flex-1 max-w-lg mx-4 hidden md:block">
+<div className="relative flex-1 max-w-lg mx-2 md:mx-4">          
             <form onSubmit={handleSubmit} className="relative w-full">
                 <input 
                     type="text" 

@@ -76,7 +76,7 @@ const Hero = () => {
   const year = (movie.release_date || movie.first_air_date || "").split("-")[0];
 
   return (
-    <div className="relative h-[85vh] w-full text-white overflow-hidden group">
+    <div className="relative w-[94%] h-[85vh] md:w-full text-white overflow-hidden group">
       
       {/* الخلفية */}
       <div className="absolute w-full h-full">

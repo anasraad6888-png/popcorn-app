@@ -64,7 +64,7 @@ const Row = ({ title, fetchUrl, isLargeRow = false }: RowProps) => {
       </h2>
       
       {/* الكروت */}
-      <div className="flex items-center gap-4 overflow-x-scroll scrollbar-hide scroll-smooth pb-12 pt-6 px-2">
+      <div className="flex items-center gap-4 overflow-x-scroll scrollbar-hide scroll-smooth md:pb-6 md:pt-6 pb-2 pt-6 px-2">
         {movies.map((movie) => (
           (movie.poster_path || movie.backdrop_path) && (
             // 4. تحسين الرابط: نحدد النوع (tv/movie) لتسهيل عمل صفحة المشاهدة

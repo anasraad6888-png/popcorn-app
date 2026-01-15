@@ -18,7 +18,7 @@ export default function Home() {
     <main>
       <Hero />
       
-<div className="flex flex-col gap-8 -mt-32 md:-mt-0 pb-20 px-4 md:px-8 bg-[#141414]">
+<div className="relative z-20 flex flex-col gap-8 -mt-[0px] md:-mt-0 pb-20 px-6 md:px-8 bg-[#141414]">
         <Row title={t('trending')} fetchUrl={requests.fetchTrending} />
         <Row title={t('top_rated')} fetchUrl={requests.fetchTopRated} />
         <Row title={t('action')} fetchUrl={requests.fetchActionMovies} />
