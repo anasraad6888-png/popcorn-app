@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
-import { useRouter, usePathname } from 'next/navigation'; // 1. أضفنا usePathname
+import { useRouter, usePathname } from 'next/navigation';
 import { account } from '../app/appwrite'; 
 import { useTranslations, useLocale } from 'next-intl';
 
@@ -17,27 +17,39 @@ interface SearchResult {
 
 const Navbar = () => {
   const t = useTranslations('Navbar');
-  const locale = useLocale(); // "ar" or "en"
+  const locale = useLocale(); 
   const router = useRouter();
-  const pathname = usePathname(); // الرابط الحالي (مثلاً: /ar/watch/123)
+  const pathname = usePathname();
 
   const [show, setShow] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  
+  // 1. حالة القائمة الخاصة بالموبايل
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+  
   const [user, setUser] = useState<any>(null);
 
   const searchTimeout = useRef<NodeJS.Timeout | null>(null);
   const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
 
-  // 2. دالة تبديل اللغة
   const switchLanguage = () => {
     const newLocale = locale === 'ar' ? 'en' : 'ar';
-    // نقوم باستبدال كود اللغة الحالي بالكود الجديد في الرابط
-    // مثال: /ar/movies -> /en/movies
     const newPath = pathname.replace(`/${locale}`, `/${newLocale}`);
     router.push(newPath);
+    setShowMobileMenu(false); // إغلاق القائمة بعد الاختيار
+  };
+
+  // 2. دالة تسجيل الخروج (تمت إضافتها للناف بار)
+  const handleLogout = async () => {
+    try {
+      await account.deleteSession('current');
+      window.location.href = '/'; 
+    } catch (error) {
+      console.error("فشل تسجيل الخروج", error);
+    }
   };
 
   useEffect(() => {
@@ -94,26 +106,19 @@ const Navbar = () => {
     <nav className={`fixed top-0 start-0 w-full z-40 transition-all duration-300 p-4 md:py-4 md:ps-20 md:pe-8 ${show ? 'bg-[#141414]' : 'bg-gradient-to-b from-black/80 to-transparent'}`}>
       <div className="flex items-center justify-between gap-4">
         
-{/* اللوجو والقوائم */}
+        {/* اللوجو والقوائم */}
         <div className="flex items-center gap-8">
             <Link href="/">
-                
-                {/* 1. لوجو الموبايل (الأيقونة فقط) */}
-                {/* يظهر في الشاشات الصغيرة (block) ويختفي في المتوسطة فما فوق (md:hidden) */}
                 <img 
-                    src={t('logo_mobile')} // أو ضع المسار مباشرة "/logo-icon.png"
+                    src={t('logo_mobile')} 
                     alt="PopCorn" 
                     className="block md:hidden w-10 h-10 object-contain cursor-pointer hover:scale-105 transition-transform duration-200" 
                 />
-
-                {/* 2. لوجو الكمبيوتر (النص الكامل) */}
-                {/* يختفي في الشاشات الصغيرة (hidden) ويظهر في المتوسطة فما فوق (md:block) */}
                 <img 
                     src={t('logo')} 
                     alt="PopCorn" 
                     className="hidden md:block w-24 md:w-32 h-auto object-contain cursor-pointer hover:scale-105 transition-transform duration-200" 
                 />
-
             </Link>
             
             <ul className="hidden md:flex gap-6 text-gray-300 text-sm font-medium">
@@ -124,7 +129,7 @@ const Navbar = () => {
         </div>
 
         {/* البحث */}
-<div className="relative flex-1 max-w-lg mx-2 md:mx-4">          
+        <div className="relative flex-1 max-w-lg mx-2 md:mx-4">          
             <form onSubmit={handleSubmit} className="relative w-full">
                 <input 
                     type="text" 
@@ -140,7 +145,6 @@ const Navbar = () => {
                 </button>
             </form>
 
-            {/* القائمة المنسدلة للبحث */}
             {showDropdown && (query.length > 2) && (
                 <div className="absolute top-12 start-0 w-full bg-[#1f1f1f] rounded-xl shadow-2xl border border-gray-700 overflow-hidden z-[60]">
                     {loading ? (
@@ -176,31 +180,93 @@ const Navbar = () => {
             )}
         </div>
 
-        {/* القسم الأيمن: زر اللغة + المستخدم */}
-        <div className="flex items-center gap-4 shrink-0"> 
+        {/* القسم الأيمن (الأزرار والمستخدم) */}
+        <div className="relative flex items-center gap-4 shrink-0"> 
             
-            {/* 3. زر تغيير اللغة (الجديد) */}
+            {/* --- نسخة الكمبيوتر (تختفي في الموبايل) --- */}
+            <div className="hidden md:flex items-center gap-4">
+                <button 
+                    onClick={switchLanguage}
+                    className="flex items-center justify-center border border-gray-600 hover:border-[#FFD700] text-gray-300 hover:text-[#FFD700] px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-300"
+                >
+                    {locale === 'ar' ? 'English' : 'العربية'}
+                </button>
+
+                {user ? (
+                    <div className="flex items-center gap-3">
+                    <span className="text-white font-medium text-sm">
+                        {t('welcome')} <span className="text-[#FFD700] font-bold">{user.name}</span>
+                    </span>
+                    <div className="w-9 h-9 rounded bg-[#FFD700] flex items-center justify-center text-black font-bold text-lg overflow-hidden">
+                        {user.name.charAt(0).toUpperCase()}
+                    </div>
+                    </div>
+                ) : (
+                    <Link href="/login">
+                        <button className="px-6 py-2.5 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-white font-bold text-sm transition-all duration-300 hover:bg-white/10 hover:border-[#FFD700]/50 hover:text-[#FFD700] hover:shadow-[0_0_15px_rgba(255,215,0,0.2)]">
+                            {t('login')}
+                        </button>
+                    </Link>
+                )}
+            </div>
+
+            {/* --- نسخة الموبايل (زر القائمة فقط) --- */}
             <button 
-                onClick={switchLanguage}
-                className="hidden md:flex items-center justify-center border border-gray-600 hover:border-[#FFD700] text-gray-300 hover:text-[#FFD700] px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-300"
+                className="md:hidden p-2 text-white bg-white/10 rounded-lg hover:bg-white/20 transition"
+                onClick={() => setShowMobileMenu(!showMobileMenu)}
             >
-                {/* إذا كانت اللغة الحالية عربي، اعرض English، والعكس */}
-                {locale === 'ar' ? 'English' : 'العربية'}
+                {/* أيقونة القائمة (Hamburger) */}
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                </svg>
             </button>
 
-            {/* المستخدم */}
-            {user ? (
-                <div className="flex items-center gap-3">
-                   <span className="text-white font-medium text-sm hidden md:block">
-                     {t('welcome')} <span className="text-[#FFD700] font-bold">{user.name}</span>
-                   </span>
+            {/* --- القائمة المنسدلة للموبايل --- */}
+            {showMobileMenu && (
+                <div className="absolute top-14 end-0 w-56 bg-[#1f1f1f] border border-gray-700 rounded-xl shadow-2xl p-2 flex flex-col gap-1 z-50 md:hidden animate-in fade-in slide-in-from-top-2">
+                    
+                    {/* 1. حالة المستخدم (ترحيب أو زر دخول) */}
+                    {user ? (
+                        <div className="text-white text-xs p-3 text-center border-b border-gray-700 mb-1">
+                            {locale === 'ar' ? 'أهلاً' : 'Hello'} <span className="text-[#FFD700] font-bold text-sm block mt-1">{user.name}</span>
+                        </div>
+                    ) : (
+                        <Link href="/login" onClick={() => setShowMobileMenu(false)}>
+                            <button className="w-full flex items-center justify-center gap-2 p-2 rounded-lg bg-[#FFD700] text-black font-bold text-sm hover:bg-[#FFC000]">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                                    <path fillRule="evenodd" d="M7.5 3.75A1.5 1.5 0 0 0 6 5.25v13.5a1.5 1.5 0 0 0 1.5 1.5h6a1.5 1.5 0 0 0 1.5-1.5V15a.75.75 0 0 1 1.5 0v3.75a3 3 0 0 1-3 3h-6a3 3 0 0 1-3-3V5.25a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3V9A.75.75 0 0 1 15 9V5.25a1.5 1.5 0 0 0-1.5-1.5h-6Zm10.72 4.72a.75.75 0 0 1 1.06 0l3 3a.75.75 0 0 1 0 1.06l-3 3a.75.75 0 1 1-1.06-1.06l1.72-1.72H9a.75.75 0 0 1 0-1.5h10.94l-1.72-1.72a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
+                                </svg>
+                                {t('login')}
+                            </button>
+                        </Link>
+                    )}
+
+                    {/* 2. زر تغيير اللغة */}
+                    <button 
+                        onClick={switchLanguage}
+                        className="w-full flex items-center justify-between p-2 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition text-sm font-medium"
+                    >
+                        <span>{locale === 'ar' ? 'اللغة' : 'Language'}</span>
+                        <span className="text-[#FFD700] font-bold text-xs border border-[#FFD700] px-1.5 rounded">{locale === 'ar' ? 'English' : 'العربية'}</span>
+                    </button>
+
+                    {/* 3. زر تسجيل الخروج */}
+                    <button 
+                        onClick={handleLogout}
+                        disabled={!user}
+                        className={`w-full flex items-center gap-2 p-2 rounded-lg text-sm font-bold transition
+                            ${user 
+                                ? "text-red-500 hover:bg-red-500/10 cursor-pointer" 
+                                : "text-gray-600 cursor-not-allowed opacity-50"
+                            }`}
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
+                        </svg>
+                        {locale === 'ar' ? 'تسجيل الخروج' : 'Logout'}
+                    </button>
+
                 </div>
-            ) : (
-            <Link href="/login">
-                <button className="px-6 py-2.5 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-white font-bold text-sm transition-all duration-300 hover:bg-white/10 hover:border-[#FFD700]/50 hover:text-[#FFD700] hover:shadow-[0_0_15px_rgba(255,215,0,0.2)]">
-                    {t('login')}
-                </button>
-            </Link>
             )}
 
         </div>

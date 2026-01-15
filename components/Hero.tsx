@@ -1,9 +1,8 @@
 "use client";
-import { useTranslations, useLocale } from 'next-intl'; // 1. استيراد useLocale
+import { useTranslations, useLocale } from 'next-intl';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 
-// تعريف واجهة البيانات
 interface Movie {
   id: number;
   title?: string;
@@ -19,23 +18,18 @@ interface Movie {
 const Hero = () => {
   const [movie, setMovie] = useState<Movie | null>(null);
   const [allMovies, setAllMovies] = useState<Movie[]>([]);
-  
   const [fade, setFade] = useState(true); 
   
   const t = useTranslations('Hero');
-  const locale = useLocale(); // 2. معرفة اللغة الحالية
+  const locale = useLocale(); 
   
-  // تحديد كود اللغة للـ API (عربي أو انكليزي)
   const apiLang = locale === 'ar' ? 'ar-SA' : 'en-US'; 
   const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
 
-  // 1. جلب البيانات (تم التعديل لتكون اللغة ديناميكية)
   useEffect(() => {
     async function fetchData() {
       try {
-        // بدلاً من استخدام requests.fetchTrending الثابت، نستخدم رابط مباشر مع اللغة المتغيرة
         const url = `https://api.themoviedb.org/3/trending/all/week?api_key=${API_KEY}&language=${apiLang}`;
-        
         const request = await fetch(url);
         const data = await request.json();
         setAllMovies(data.results);
@@ -47,12 +41,10 @@ const Hero = () => {
       }
     }
     fetchData();
-  }, [locale, API_KEY, apiLang]); // أعد الجلب عند تغيير اللغة
+  }, [locale, API_KEY, apiLang]);
 
-  // 2. مؤقت التبديل (نفس المنطق السابق)
   useEffect(() => {
     if (allMovies.length === 0) return;
-
     const interval = setInterval(() => {
       setFade(false);
       setTimeout(() => {
@@ -61,25 +53,18 @@ const Hero = () => {
         setFade(true);
       }, 500); 
     }, 8000);
-
     return () => clearInterval(interval);
   }, [allMovies]);
-
-  // دالة تقصير النص
-  function truncate(str: string | undefined, n: number) {
-    if (!str) return "";
-    return str.length > n ? str.substr(0, n - 1) + "..." : str;
-  }
 
   if (!movie) return null;
 
   const year = (movie.release_date || movie.first_air_date || "").split("-")[0];
 
   return (
-    <div className="relative w-[94%] h-[85vh] md:w-full text-white overflow-hidden group">
+    <div className="relative w-full h-[67vh] md:h-[85vh] text-white overflow-hidden group">
       
       {/* الخلفية */}
-      <div className="absolute w-full h-full">
+      <div className="absolute inset-0 w-full h-full">
         <div className="absolute top-0 w-full h-32 bg-gradient-to-b from-black/60 to-transparent z-10" />
         
         <img 
@@ -89,14 +74,15 @@ const Hero = () => {
         />
 
         <div className="absolute inset-0 bg-gradient-to-t from-[#141414] via-transparent to-transparent z-10"></div>
-        {/* التعديل: تدرج لوني يتغير اتجاهه حسب اللغة باستخدام start/end */}
         <div className="absolute inset-0 bg-gradient-to-r from-[#141414]/90 via-[#141414]/40 to-transparent z-10 ltr:bg-gradient-to-r rtl:bg-gradient-to-l"></div>
       </div>
 
-      {/* المحتوى النصي: تم التأكد من استخدام start للمحاذاة الصحيحة */}
-      <div className={`absolute top-[20%] start-6 md:start-12 z-20 max-w-2xl text-start transition-all duration-700 transform ${fade ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+      {/* المحتوى النصي: تم التعديل هنا لحل مشكلة القص */}
+      {/* start-4 end-4: يضمن وجود هامش من الجهتين في الموبايل */}
+      <div className={`absolute top-[20%] start-4 max-w-[calc(100vw-2rem)] md:start-12 md:end-auto z-20 text-start transition-all duration-700 transform ${fade ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
         
-        <h1 className="text-5xl md:text-7xl font-black mb-4 drop-shadow-2xl text-white leading-tight">
+        {/* تم تصغير الخط في الموبايل text-3xl لمنع التمدد الزائد */}
+        <h1 className="text-3xl md:text-6xl lg:text-7xl font-black mb-4 drop-shadow-2xl text-white leading-tight">
           {movie?.title || movie?.name || movie?.original_name}
         </h1>
 
@@ -109,12 +95,12 @@ const Hero = () => {
             <span className="text-gray-200">{year}</span>
         </div>
         
-        <p className="text-lg md:text-xl text-gray-200 mb-8 drop-shadow-lg leading-relaxed line-clamp-3 md:line-clamp-4 max-w-xl">
-          {truncate(movie?.overview, 200)}
+        {/* تم إزالة دالة truncate والاعتماد على line-clamp لقص النص بشكل نظيف */}
+        <p className="text-base md:text-xl text-gray-200 mb-8 drop-shadow-lg leading-relaxed line-clamp-6 md:line-clamp-4 break-words max-w-xl">
+          {movie?.overview}
         </p>
         
         <div className="flex gap-3 md:gap-4 mt-4 md:mt-0">
-          
           <Link href={`/watch/${movie.id}?type=${movie.first_air_date ? 'tv' : 'movie'}`}>
             <button className="flex items-center gap-2 md:gap-3 px-5 py-2 md:px-8 md:py-3 bg-[#FFD700] hover:bg-[#FFC000] text-black font-bold text-sm md:text-base rounded-lg transition-all duration-300 transform hover:scale-105 shadow-[0_0_20px_rgba(255,215,0,0.4)]">
                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 md:w-6 md:h-6">
@@ -132,10 +118,8 @@ const Hero = () => {
               {t('more_info')}
             </button>
           </Link>
-
         </div>
       </div>
-
     </div>
   );
 };
