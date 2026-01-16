@@ -1,5 +1,5 @@
 // app/appwrite.ts
-import { Client, Account, Databases, Avatars, Query } from 'appwrite';
+import { Client, Account, Databases, Avatars, Query, Storage } from 'appwrite';
 
 // 1. تهيئة العميل (Client)
 const client = new Client();
@@ -13,6 +13,7 @@ export const account = new Account(client);
 export const databases = new Databases(client);
 export const avatars = new Avatars(client);
 export { Query } from 'appwrite';
+export const storage = new Storage(client);
 // لتوليد معرفات عشوائية فريدة
 export { ID } from 'appwrite';
 export const DATABASE_ID = "6967c9d1001bcb3ce08e"; 

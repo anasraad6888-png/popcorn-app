@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FaGoogle } from 'react-icons/fa';
 import { useTranslations } from 'next-intl';
+import { or } from 'firebase/firestore/lite';
 
 export default function LoginPage() {
   const t = useTranslations('Login');
@@ -53,6 +54,7 @@ export default function LoginPage() {
   const handleRecovery = async () => {
     setError('');
     setSuccessMsg('');
+    const origin = window.location.origin;
 
     // 1. يجب أن يكون الإيميل مكتوباً
     if (!email) {
@@ -64,7 +66,7 @@ export default function LoginPage() {
         // 2. إرسال طلب الاستعادة لـ Appwrite
         // ملاحظة: الرابط الثاني هو الصفحة التي سيتوجه لها المستخدم عند ضغط الرابط في الإيميل
         // سنفترض حالياً أنها الصفحة الرئيسية حتى تقوم بإنشاء صفحة خاصة للاستعادة
-        await account.createRecovery(email, 'http://localhost:3000/reset-password'); 
+        await account.createRecovery(email, `${origin}/reset-password`); 
         
         // 3. إظهار رسالة نجاح
         setSuccessMsg(t('recovery_sent'));
@@ -76,11 +78,12 @@ export default function LoginPage() {
 
   // دالة الدخول بـ Google
   const handleGoogleLogin = () => {
+    const origin = window.location.origin;
     try {
       account.createOAuth2Session(
           OAuthProvider.Google,
-          'http://localhost:3000', 
-          'http://localhost:3000/login'
+          `${origin}/`, 
+          `${origin}/login`
       );
     } catch (error) {
       console.error("فشل الانتقال لجوجل", error);
@@ -88,7 +91,9 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative min-h-screen w-full flex items-center justify-center bg-[url('https://assets.nflxext.com/ffe/siteui/vlv3/f841d4c7-10e1-40af-bcae-07a3f8dc141a/f6d7434e-d6de-4185-a6d4-c77a2d08737b/US-en-20220502-popsignuptwoweeks-perspective_alpha_website_medium.jpg')] bg-cover bg-center bg-no-repeat bg-fixed">
+    <div className="relative min-h-screen w-full flex items-center 
+    justify-center 
+    bg-[url('/background.jpeg')] bg-cover bg-center bg-no-repeat bg-fixed">
       <div className="absolute inset-0 bg-black/60 z-0"></div>
       
       <div className="relative z-10 bg-black/75 backdrop-blur-md border border-white/10 p-8 md:p-12 rounded-xl shadow-2xl w-full max-w-md mx-4">

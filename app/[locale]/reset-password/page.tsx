@@ -58,7 +58,8 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <div className="relative min-h-screen w-full flex items-center justify-center bg-[url('https://assets.nflxext.com/ffe/siteui/vlv3/f841d4c7-10e1-40af-bcae-07a3f8dc141a/f6d7434e-d6de-4185-a6d4-c77a2d08737b/US-en-20220502-popsignuptwoweeks-perspective_alpha_website_medium.jpg')] bg-cover bg-center bg-no-repeat bg-fixed">
+    <div className="relative min-h-screen w-full flex items-center 
+    justify-center bg-[url('/background.jpeg')] bg-cover bg-center bg-no-repeat bg-fixed">
       <div className="absolute inset-0 bg-black/60 z-0"></div>
       
       <div className="relative z-10 bg-black/75 backdrop-blur-md border border-white/10 p-8 md:p-12 rounded-xl shadow-2xl w-full max-w-md mx-4">

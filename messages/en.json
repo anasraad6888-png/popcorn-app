@@ -8,7 +8,7 @@
     "welcome": "Hello,",
     "no_results": "No results found",
     "searching": "Searching...",
-    "logo":"logo-en.png",
+    "logo":"/logo-en.png",
     "logo_mobile": "/logo-icon.png"
   },
   "Hero": {
@@ -108,5 +108,27 @@
     "error_mismatch": "Passwords do not match",
     "error_missing_params": "Invalid link (missing parameters)",
     "general_error": "Error changing password"
+  },
+  "Settings": {
+    "title": "Settings",
+    "profile_section": "Profile",
+    "email_label": "Email Address",
+    "name_label": "Full Name",
+    "update_btn": "Update Profile",
+    "success_update": "Profile updated successfully! 🎉",
+    "error_update": "Error updating profile",
+    "loading": "Loading...",
+    "logout": "Log Out",
+    "preferences_section": "App Preferences",
+    "adult_content": "Show Adult Content (+18)",
+    "autoplay_video": "Autoplay Videos",
+    "prefs_updated": "Preferences saved successfully! ✅",
+    "error_empty_name": "Name cannot be empty",
+    "error_image_size": "Image size must be less than 2MB",
+    "danger_zone": "Delete Account",
+    "delete_account_title": "Delete Account",
+    "delete_account_desc": "Deleting your account will permanently remove all your data. This action cannot be undone.",
+    "delete_btn": "Delete My Account",
+    "uploading" : "uploading..."
   }
 }

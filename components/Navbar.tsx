@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { account } from '../app/appwrite'; 
+import { account, storage } from '../app/appwrite'; // 👈 1. تأكد من استيراد storage
 import { useTranslations, useLocale } from 'next-intl';
 
 interface SearchResult {
@@ -21,16 +21,18 @@ const Navbar = () => {
   const router = useRouter();
   const pathname = usePathname();
 
+  // نفس الـ Bucket ID المستخدم في صفحة الإعدادات
+  const BUCKET_ID = '696a3bb00027ac5ddf45'; // 👈 2. تأكد أن هذا هو الرقم الصحيح
+
   const [show, setShow] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
-  
-  // 1. حالة القائمة الخاصة بالموبايل
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   
   const [user, setUser] = useState<any>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null); // 👈 3. حالة جديدة للصورة
 
   const searchTimeout = useRef<NodeJS.Timeout | null>(null);
   const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
@@ -39,10 +41,9 @@ const Navbar = () => {
     const newLocale = locale === 'ar' ? 'en' : 'ar';
     const newPath = pathname.replace(`/${locale}`, `/${newLocale}`);
     router.push(newPath);
-    setShowMobileMenu(false); // إغلاق القائمة بعد الاختيار
+    setShowMobileMenu(false);
   };
 
-  // 2. دالة تسجيل الخروج (تمت إضافتها للناف بار)
   const handleLogout = async () => {
     try {
       await account.deleteSession('current');
@@ -52,11 +53,18 @@ const Navbar = () => {
     }
   };
 
+  // 4. تعديل دالة جلب البيانات لتشمل الصورة
   useEffect(() => {
     const getUserData = async () => {
       try {
         const sessionUser = await account.get();
         setUser(sessionUser);
+
+        // التحقق من وجود صورة في التفضيلات
+        if (sessionUser.prefs && sessionUser.prefs.avatarId) {
+             const fileView = storage.getFileView(BUCKET_ID, sessionUser.prefs.avatarId);
+             setAvatarUrl(fileView.toString());
+        }
       } catch (error) {
         setUser(null);
       }
@@ -64,6 +72,7 @@ const Navbar = () => {
     getUserData();
   }, []);
 
+  // ... (باقي كود البحث والـ Scroll كما هو بدون تغيير) ...
   useEffect(() => {
     const handleScroll = () => setShow(window.scrollY > 100);
     window.addEventListener("scroll", handleScroll);
@@ -106,19 +115,11 @@ const Navbar = () => {
     <nav className={`fixed top-0 start-0 w-full z-40 transition-all duration-300 p-4 md:py-4 md:ps-20 md:pe-8 ${show ? 'bg-[#141414]' : 'bg-gradient-to-b from-black/80 to-transparent'}`}>
       <div className="flex items-center justify-between gap-4">
         
-        {/* اللوجو والقوائم */}
+        {/* اللوجو */}
         <div className="flex items-center gap-8">
             <Link href="/">
-                <img 
-                    src={t('logo_mobile')} 
-                    alt="PopCorn" 
-                    className="block md:hidden w-10 h-10 object-contain cursor-pointer hover:scale-105 transition-transform duration-200" 
-                />
-                <img 
-                    src={t('logo')} 
-                    alt="PopCorn" 
-                    className="hidden md:block w-24 md:w-32 h-auto object-contain cursor-pointer hover:scale-105 transition-transform duration-200" 
-                />
+                <img src={t('logo_mobile')} alt="PopCorn" className="block md:hidden w-10 h-10 object-contain cursor-pointer hover:scale-105 transition-transform duration-200" />
+                <img src={t('logo')} alt="PopCorn" className="hidden md:block w-24 md:w-32 h-auto object-contain cursor-pointer hover:scale-105 transition-transform duration-200" />
             </Link>
             
             <ul className="hidden md:flex gap-6 text-gray-300 text-sm font-medium">
@@ -128,7 +129,7 @@ const Navbar = () => {
             </ul>
         </div>
 
-        {/* البحث */}
+        {/* البحث (نفس الكود القديم) */}
         <div className="relative flex-1 max-w-lg mx-2 md:mx-4">          
             <form onSubmit={handleSubmit} className="relative w-full">
                 <input 
@@ -140,39 +141,24 @@ const Navbar = () => {
                     onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
                     onFocus={() => query.length > 2 && setShowDropdown(true)}
                 />
-                <button type="submit" className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400">
-                    🔍
-                </button>
+                <button type="submit" className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</button>
             </form>
-
             {showDropdown && (query.length > 2) && (
                 <div className="absolute top-12 start-0 w-full bg-[#1f1f1f] rounded-xl shadow-2xl border border-gray-700 overflow-hidden z-[60]">
                     {loading ? (
                         <div className="p-4 text-center text-gray-400 text-sm">{t('searching')}</div>
                     ) : results.length > 0 ? (
-                        <>
-                            {results.map((item) => (
-                                item.poster_path && (
-                                    <Link key={item.id} href={`/watch/${item.id}?type=${item.media_type}`} onClick={() => setQuery("")}>
-                                        <div className="flex gap-4 p-3 hover:bg-[#333] transition cursor-pointer border-b border-gray-800 last:border-0 group">
-                                            <img 
-                                                src={`https://image.tmdb.org/t/p/w92${item.poster_path}`} 
-                                                alt={item.title || item.name} 
-                                                className="w-12 h-16 object-cover rounded bg-gray-800"
-                                            />
-                                            <div className="flex flex-col justify-center flex-1">
-                                                <h4 className="text-white font-bold text-sm group-hover:text-[#FFD700] transition line-clamp-1 text-start">
-                                                    {item.title || item.name}
-                                                </h4>
-                                                <div className="flex items-center gap-3 mt-1 text-xs text-gray-400">
-                                                    <span className="text-yellow-500 font-bold">⭐ {item.vote_average?.toFixed(1)}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </Link>
-                                )
-                            ))}
-                        </>
+                        results.map((item) => item.poster_path && (
+                           <Link key={item.id} href={`/watch/${item.id}?type=${item.media_type}`} onClick={() => setQuery("")}>
+                               <div className="flex gap-4 p-3 hover:bg-[#333] transition cursor-pointer border-b border-gray-800 last:border-0 group">
+                                   <img src={`https://image.tmdb.org/t/p/w92${item.poster_path}`} alt={item.title} className="w-12 h-16 object-cover rounded bg-gray-800"/>
+                                   <div className="flex flex-col justify-center flex-1">
+                                       <h4 className="text-white font-bold text-sm group-hover:text-[#FFD700] transition line-clamp-1 text-start">{item.title || item.name}</h4>
+                                       <span className="text-yellow-500 text-xs font-bold mt-1">⭐ {item.vote_average?.toFixed(1)}</span>
+                                   </div>
+                               </div>
+                           </Link>
+                        ))
                     ) : (
                         <div className="p-4 text-center text-gray-400 text-sm">{t('no_results')}</div>
                     )}
@@ -180,26 +166,33 @@ const Navbar = () => {
             )}
         </div>
 
-        {/* القسم الأيمن (الأزرار والمستخدم) */}
+        {/* القسم الأيمن */}
         <div className="relative flex items-center gap-4 shrink-0"> 
             
-            {/* --- نسخة الكمبيوتر (تختفي في الموبايل) --- */}
+            {/* نسخة الكمبيوتر */}
             <div className="hidden md:flex items-center gap-4">
-                <button 
-                    onClick={switchLanguage}
-                    className="flex items-center justify-center border border-gray-600 hover:border-[#FFD700] text-gray-300 hover:text-[#FFD700] px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-300"
-                >
+                <button onClick={switchLanguage} className="flex items-center justify-center border border-gray-600 hover:border-[#FFD700] text-gray-300 hover:text-[#FFD700] px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-300">
                     {locale === 'ar' ? 'English' : 'العربية'}
                 </button>
 
                 {user ? (
                     <div className="flex items-center gap-3">
-                    <span className="text-white font-medium text-sm">
-                        {t('welcome')} <span className="text-[#FFD700] font-bold">{user.name}</span>
-                    </span>
-                    <div className="w-9 h-9 rounded bg-[#FFD700] flex items-center justify-center text-black font-bold text-lg overflow-hidden">
-                        {user.name.charAt(0).toUpperCase()}
-                    </div>
+                        <span className="text-white font-medium text-sm">
+                            {t('welcome')} <span className="text-[#FFD700] font-bold">{user.name}</span>
+                        </span>
+                        
+                        {/* 👈 5. عرض الصورة أو الحرف */}
+{/* 👈 5. عرض الصورة أو الحرف */}
+                        <div className="w-9 h-9 rounded-full bg-[#FFD700] flex items-center justify-center text-black font-bold text-lg overflow-hidden border border-[#FFD700] shadow-md">
+                            {avatarUrl ? (
+                                <img src={avatarUrl} alt="User Avatar" className="w-full h-full object-cover" />
+                            ) : (
+                                /* تحسين: التأكد من وجود الاسم وعرض الحرف الأول أو U كبديل */
+                                <span>
+                                    {user?.name ? user.name.trim().charAt(0).toUpperCase() : "U"}
+                                </span>
+                            )}
+                        </div>
                     </div>
                 ) : (
                     <Link href="/login">
@@ -210,67 +203,52 @@ const Navbar = () => {
                 )}
             </div>
 
-            {/* --- نسخة الموبايل (زر القائمة فقط) --- */}
-            <button 
-                className="md:hidden p-2 text-white bg-white/10 rounded-lg hover:bg-white/20 transition"
-                onClick={() => setShowMobileMenu(!showMobileMenu)}
-            >
-                {/* أيقونة القائمة (Hamburger) */}
+            {/* زر القائمة للموبايل */}
+            <button className="md:hidden p-2 text-white bg-white/10 rounded-lg hover:bg-white/20 transition" onClick={() => setShowMobileMenu(!showMobileMenu)}>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
                 </svg>
             </button>
 
-            {/* --- القائمة المنسدلة للموبايل --- */}
+            {/* قائمة الموبايل */}
             {showMobileMenu && (
                 <div className="absolute top-14 end-0 w-56 bg-[#1f1f1f] border border-gray-700 rounded-xl shadow-2xl p-2 flex flex-col gap-1 z-50 md:hidden animate-in fade-in slide-in-from-top-2">
-                    
-                    {/* 1. حالة المستخدم (ترحيب أو زر دخول) */}
                     {user ? (
-                        <div className="text-white text-xs p-3 text-center border-b border-gray-700 mb-1">
-                            {locale === 'ar' ? 'أهلاً' : 'Hello'} <span className="text-[#FFD700] font-bold text-sm block mt-1">{user.name}</span>
+                        <div className="text-white text-xs p-3 text-center border-b border-gray-700 mb-1 flex flex-col items-center gap-2">
+                            {/* 👈 عرض الصورة في قائمة الموبايل أيضاً */}
+                            <div className="w-10 h-10 rounded-full bg-[#FFD700] flex items-center justify-center text-black font-bold text-lg overflow-hidden border border-[#FFD700]">
+                                {avatarUrl ? (
+                                    <img src={avatarUrl} alt="User Avatar" className="w-full h-full object-cover" />
+                                ) : (
+                                    <span>
+                                        {user?.name ? user.name.trim().charAt(0).toUpperCase() : "U"}
+                                    </span>
+                                )}
+                            </div>
+                            <div>
+                                {locale === 'ar' ? 'أهلاً' : 'Hello'} <span className="text-[#FFD700] font-bold text-sm">{user.name}</span>
+                            </div>
                         </div>
                     ) : (
                         <Link href="/login" onClick={() => setShowMobileMenu(false)}>
                             <button className="w-full flex items-center justify-center gap-2 p-2 rounded-lg bg-[#FFD700] text-black font-bold text-sm hover:bg-[#FFC000]">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                                    <path fillRule="evenodd" d="M7.5 3.75A1.5 1.5 0 0 0 6 5.25v13.5a1.5 1.5 0 0 0 1.5 1.5h6a1.5 1.5 0 0 0 1.5-1.5V15a.75.75 0 0 1 1.5 0v3.75a3 3 0 0 1-3 3h-6a3 3 0 0 1-3-3V5.25a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3V9A.75.75 0 0 1 15 9V5.25a1.5 1.5 0 0 0-1.5-1.5h-6Zm10.72 4.72a.75.75 0 0 1 1.06 0l3 3a.75.75 0 0 1 0 1.06l-3 3a.75.75 0 1 1-1.06-1.06l1.72-1.72H9a.75.75 0 0 1 0-1.5h10.94l-1.72-1.72a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
-                                </svg>
                                 {t('login')}
                             </button>
                         </Link>
                     )}
 
-                    {/* 2. زر تغيير اللغة */}
-                    <button 
-                        onClick={switchLanguage}
-                        className="w-full flex items-center justify-between p-2 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition text-sm font-medium"
-                    >
+                    <button onClick={switchLanguage} className="w-full flex items-center justify-between p-2 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition text-sm font-medium">
                         <span>{locale === 'ar' ? 'اللغة' : 'Language'}</span>
                         <span className="text-[#FFD700] font-bold text-xs border border-[#FFD700] px-1.5 rounded">{locale === 'ar' ? 'English' : 'العربية'}</span>
                     </button>
 
-                    {/* 3. زر تسجيل الخروج */}
-                    <button 
-                        onClick={handleLogout}
-                        disabled={!user}
-                        className={`w-full flex items-center gap-2 p-2 rounded-lg text-sm font-bold transition
-                            ${user 
-                                ? "text-red-500 hover:bg-red-500/10 cursor-pointer" 
-                                : "text-gray-600 cursor-not-allowed opacity-50"
-                            }`}
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
-                        </svg>
+                    <button onClick={handleLogout} disabled={!user} className={`w-full flex items-center gap-2 p-2 rounded-lg text-sm font-bold transition ${user ? "text-red-500 hover:bg-red-500/10 cursor-pointer" : "text-gray-600 cursor-not-allowed opacity-50"}`}>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" /></svg>
                         {locale === 'ar' ? 'تسجيل الخروج' : 'Logout'}
                     </button>
-
                 </div>
             )}
-
         </div>
-
       </div>
     </nav>
   );

@@ -6,8 +6,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import '../globals.css'; 
 
-const cairo = Cairo({ subsets: ["arabic"] });
-
+const cairo = Cairo({ subsets: ["arabic", "latin"] });
 export const metadata: Metadata = {
   title: "PopCorn",
   description: "Movies & Series App",
