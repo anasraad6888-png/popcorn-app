@@ -49,7 +49,7 @@ const Row = ({ title, fetchUrl, isLargeRow = false }: RowProps) => {
   }, [fetchUrl, apiLang]); // أعد الجلب عند تغيير اللغة أو الرابط
 
   return (
-<div className="w-full max-w-[100vw] overflow-hidden px-0 border-b border-gray-900/50 last:border-0">      
+<div className="w-full max-w-[100%] overflow-hidden px-0 border-b border-gray-900/50 last:border-0">      
       {/* العنوان */}
       <h2 className="text-xl md:text-2xl font-bold text-white mb-6 flex items-center gap-3 group cursor-pointer">
         <span className="w-1 h-6 bg-[#FFD700] rounded-full transition-all duration-300 group-hover:h-8"></span>

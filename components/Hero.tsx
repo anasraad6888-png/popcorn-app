@@ -79,7 +79,7 @@ const Hero = () => {
 
       {/* المحتوى النصي: تم التعديل هنا لحل مشكلة القص */}
       {/* start-4 end-4: يضمن وجود هامش من الجهتين في الموبايل */}
-      <div className={`absolute top-[20%] start-4 max-w-[calc(100vw-2rem)] md:start-12 md:end-auto z-20 text-start transition-all duration-700 transform ${fade ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
+      <div className={`absolute top-[20%] start-4 max-w-[calc(100%-2rem)] md:start-12 md:end-auto z-20 text-start transition-all duration-700 transform ${fade ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}>
         
         {/* تم تصغير الخط في الموبايل text-3xl لمنع التمدد الزائد */}
         <h1 className="text-3xl md:text-6xl lg:text-7xl font-black mb-4 drop-shadow-2xl text-white leading-tight">
