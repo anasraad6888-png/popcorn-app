@@ -20,7 +20,6 @@ const WatchPage = () => {
   const typeParam = searchParams.get('type');
   const locale = useLocale(); // 2. معرفة اللغة الحالية (ar أو en)
   const t = useTranslations('Watch'); // 3. تفعيل الترجمة
-  
   // تحديد لغة الـ API بناءً على لغة الموقع
   const apiLang = locale === 'ar' ? 'ar-SA' : 'en-US';
 
@@ -43,36 +42,40 @@ const WatchPage = () => {
 useEffect(() => {
     if (!id) return;
 
+    setMovie(null); 
+    setCast([]);
+    setSimilarMovies([]);
+    setTrailerUrl("");
     const fetchData = async () => {
       try {
         let data;
         let mediaType: 'movie' | 'tv' = 'movie';
-
+        const fetchOptions: RequestInit = { cache: 'no-store' };
         // المنطق الجديد:
         // إذا كان الرابط يحدد النوع كـ 'tv'، اجلب المسلسل مباشرة
         if (typeParam === 'tv') {
-            const tvReq = await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}&language=${apiLang}`);
+            const tvReq = await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}&language=${apiLang}`, fetchOptions);
             const tvData = await tvReq.json();
             data = tvData;
             mediaType = 'tv';
         } 
         // إذا كان الرابط يحدد النوع كـ 'movie'، اجلب الفيلم مباشرة
         else if (typeParam === 'movie') {
-            const movieReq = await fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=${apiLang}`);
+            const movieReq = await fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=${apiLang}`, fetchOptions);
             const movieData = await movieReq.json();
             data = movieData;
             mediaType = 'movie';
         } 
         // إذا لم يتم تحديد النوع (الوضع القديم)، جرب كفيلم ثم كمسلسل
         else {
-            const movieReq = await fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=${apiLang}`);
+            const movieReq = await fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=${apiLang}`, fetchOptions);
             const movieData = await movieReq.json();
 
             if (movieReq.ok && movieData.title) {
                data = movieData;
                mediaType = 'movie';
             } else {
-               const tvReq = await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}&language=${apiLang}`);
+               const tvReq = await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}&language=${apiLang}`, fetchOptions);
                const tvData = await tvReq.json();
                data = tvData;
                mediaType = 'tv';
@@ -169,9 +172,7 @@ const router = useRouter();
   const displayDate = movie.release_date || movie.first_air_date;
 
   return (
-    <div className="min-h-screen bg-[#141414] text-white pb-20">
-      
-      {/* القسم العلوي */}
+    <div key={locale} className="min-h-screen bg-[#141414] text-white pb-20">
       <div className="relative w-full h-[70vh] md:h-[85vh]">
         <div className="absolute inset-0">
             <img 
@@ -210,10 +211,13 @@ const router = useRouter();
 
             <div className="flex items-center gap-4">
                 {type === 'movie' && (
-                    <button className="flex items-center gap-3 bg-[#FFD700] hover:bg-[#FFC000] text-black px-8 py-3.5 rounded-lg font-bold text-lg transition hover:scale-105">
-                        <PlayIconSolid />
-                        {t('watch_movie')} {/* ترجمة الزر */}
-                    </button>
+<Link 
+                            href={`/player/${id}`} 
+                            className="flex items-center gap-3 bg-[#FFD700] hover:bg-[#FFC000] text-black px-8 py-3.5 rounded-lg font-bold text-lg transition hover:scale-105 shadow-[0_0_20px_rgba(255,215,0,0.3)]"
+                        >
+                            <PlayIconSolid />
+                            {t('watch_movie')}
+                        </Link>
                 )}
 
                 <button 
@@ -229,7 +233,7 @@ const router = useRouter();
 
         </div>
       </div>
-
+      
       <div className="px-4 md:px-12 mt-10 grid grid-cols-1 lg:grid-cols-12 gap-10">
         
         <div className="lg:col-span-8">
