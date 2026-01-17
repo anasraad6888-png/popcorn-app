@@ -5,6 +5,8 @@ import Navbar from "@/components/Navbar";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import '../globals.css'; 
+import { SidebarProvider } from '@/app/context/SidebarContext';
+import MainLayout from '@/components/MainLayout';
 
 const cairo = Cairo({ subsets: ["arabic", "latin"] });
 export const metadata: Metadata = {
@@ -33,13 +35,19 @@ export default async function RootLayout({
     <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
       <body className={cairo.className}>
         <NextIntlClientProvider messages={messages}>
+          <SidebarProvider>
            <Navbar />
            <div className="flex w-full overflow-x-hidden">
              <Sidebar />
+             
              <main className="flex-1 pb-16 md:pb-0 w-0 min-w-0">
+              <MainLayout>
                {children}
+               </MainLayout>
              </main>
+             
            </div>
+           </SidebarProvider>
         </NextIntlClientProvider>
       </body>
     </html>

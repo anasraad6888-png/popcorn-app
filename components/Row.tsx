@@ -19,9 +19,10 @@ interface RowProps {
   title: string;
   fetchUrl: string;
   isLargeRow?: boolean;
+  linkUrl?: string;
 }
 
-const Row = ({ title, fetchUrl, isLargeRow = false }: RowProps) => {
+const Row = ({ title, fetchUrl, isLargeRow = false, linkUrl }: RowProps) => {
   const [movies, setMovies] = useState<Movie[]>([]);
   const base_url = "https://image.tmdb.org/t/p/original/";
   
@@ -47,21 +48,28 @@ const Row = ({ title, fetchUrl, isLargeRow = false }: RowProps) => {
     }
     fetchData();
   }, [fetchUrl, apiLang]); // أعد الجلب عند تغيير اللغة أو الرابط
-
-  return (
-<div className="w-full max-w-[100%] overflow-hidden px-0 border-b border-gray-900/50 last:border-0">      
-      {/* العنوان */}
-      <h2 className="text-xl md:text-2xl font-bold text-white mb-6 flex items-center gap-3 group cursor-pointer">
+const TitleContent = (
+    <h2 className="text-xl md:text-2xl font-bold text-white mb-6 flex items-center gap-3 group cursor-pointer w-fit">
         <span className="w-1 h-6 bg-[#FFD700] rounded-full transition-all duration-300 group-hover:h-8"></span>
         <span className="group-hover:text-[#FFD700] transition-colors duration-300">{title}</span>
         
-        <span className="opacity-0 group-hover:opacity-100 transition-all duration-300 -translate-x-2 rtl:translate-x-2 group-hover:translate-x-0 text-[#FFD700] text-sm">
+        <span className="opacity-0 group-hover:opacity-100 transition-all duration-300 -translate-x-2 rtl:translate-x-2 group-hover:translate-x-0 text-[#FFD700] text-sm flex items-center">
            {t('browse_all')}
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4 inline mx-1 rtl:rotate-180">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
             </svg>
         </span>
-      </h2>
+    </h2>
+  );
+  return (
+<div className="w-full max-w-[100%] overflow-hidden px-0 border-b border-gray-900/50 last:border-0">      
+      {linkUrl ? (
+          <Link href={linkUrl}>
+              {TitleContent}
+          </Link>
+      ) : (
+          TitleContent
+      )}
       
       {/* الكروت */}
       <div className="flex items-center gap-4 overflow-x-scroll scrollbar-hide scroll-smooth md:pb-6 md:pt-6 pb-2 pt-6 px-2">

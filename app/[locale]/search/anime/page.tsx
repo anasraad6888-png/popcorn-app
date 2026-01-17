@@ -1,0 +1,143 @@
+"use client";
+
+import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { useLocale, useTranslations } from 'next-intl';
+
+// تعريف نوع البيانات
+interface Anime {
+  id: number;
+  name: string;
+  poster_path: string;
+  vote_average: number;
+  first_air_date: string;
+}
+
+export default function AnimePage() {
+  const locale = useLocale();
+  const t = useTranslations('Sidebar'); // لاستخدام كلمة "Anime"
+  
+  const [animes, setAnimes] = useState<Anime[]>([]);
+  const [page, setPage] = useState(1); // 1. رقم الصفحة الحالية
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false); // 2. حالة تحميل المزيد
+
+  const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
+
+  // 3. تحويل دالة الجلب لتقبل رقم الصفحة
+  const fetchAnime = async (pageNum: number) => {
+    try {
+      const lang = locale === 'ar' ? 'ar-SA' : 'en-US';
+      const response = await fetch(
+        `https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}&language=${lang}&with_genres=16&with_original_language=ja&sort_by=popularity.desc&page=${pageNum}`
+      );
+      
+      const data = await response.json();
+      return data.results || [];
+    } catch (error) {
+      console.error("Error fetching anime:", error);
+      return [];
+    }
+  };
+
+  // 4. التحميل الأولي
+  useEffect(() => {
+    const initialFetch = async () => {
+      setLoading(true);
+      const newAnimes = await fetchAnime(1);
+      setAnimes(newAnimes);
+      setLoading(false);
+    };
+    initialFetch();
+  }, [locale]);
+
+  // 5. دالة زر "عرض المزيد"
+  const handleLoadMore = async () => {
+    setLoadingMore(true);
+    const nextPage = page + 1;
+    const newAnimes = await fetchAnime(nextPage);
+    
+    // دمج النتائج الجديدة مع القديمة
+    setAnimes((prev) => [...prev, ...newAnimes]);
+    setPage(nextPage);
+    setLoadingMore(false);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#141414] flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-[#FFD700] border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#141414] text-white p-6 md:p-12 md:ps-24 md:pt-24 pt-24">
+      
+      {/* العنوان */}
+      <div className="flex items-end gap-4 mb-8 border-b border-gray-800 pb-0">
+          <h1 className="text-3xl md:text-3xl mb-6 font-bold flex items-center gap-3">
+             <span className="w-2 h-10 bg-[#FFD700] rounded-full shadow-[0_0_15px_#FFD700]"></span>
+             {t('anime')} 🎌
+          </h1>
+      </div>
+
+      {/* شبكة العرض (Grid) */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 mb-12">
+        {animes.map((item, index) => (
+          <Link 
+            key={`${item.id}-${index}`} 
+            href={`/watch/${item.id}?type=tv`} 
+            className="group relative bg-[#1f1f1f] rounded-xl overflow-hidden hover:scale-105 transition-transform duration-300 shadow-lg border border-transparent hover:border-[#FFD700]/50"
+          >
+            {/* البوستر */}
+            <div className="aspect-[2/3] w-full relative">
+              <img 
+                src={item.poster_path 
+                  ? `https://image.tmdb.org/t/p/w500${item.poster_path}` 
+                  : '/placeholder.png'
+                } 
+                alt={item.name} 
+                className="w-full h-full object-cover"
+              />
+              
+              <div className="absolute top-2 start-2 bg-black/70 backdrop-blur-md px-2 py-1 rounded-lg flex items-center gap-1">
+                <span className="text-[#FFD700] text-xs">★</span>
+                <span className="text-white text-xs font-bold">{item.vote_average.toFixed(1)}</span>
+              </div>
+            </div>
+
+            {/* المعلومات */}
+            <div className="p-4">
+              <h3 className="font-bold text-sm md:text-base line-clamp-1 group-hover:text-[#FFD700] transition-colors">
+                {item.name}
+              </h3>
+              <p className="text-gray-400 text-xs mt-1">
+                {item.first_air_date?.split('-')[0] || 'N/A'}
+              </p>
+            </div>
+          </Link>
+        ))}
+      </div>
+
+      {/* 6. زر عرض المزيد */}
+      <div className="flex justify-center pb-8">
+        <button
+            onClick={handleLoadMore}
+            disabled={loadingMore}
+            className="bg-[#FFD700] text-black font-bold py-3 px-8 rounded-full hover:bg-[#FFC000] active:scale-95 transition-all shadow-[0_0_15px_rgba(255,215,0,0.3)] hover:shadow-[0_0_25px_rgba(255,215,0,0.5)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+        >
+            {loadingMore ? (
+                <>
+                   <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                   {locale === 'ar' ? 'جاري التحميل...' : 'Loading...'}
+                </>
+            ) : (
+                locale === 'ar' ? 'عرض المزيد' : 'Load More'
+            )}
+        </button>
+      </div>
+
+    </div>
+  );
+}

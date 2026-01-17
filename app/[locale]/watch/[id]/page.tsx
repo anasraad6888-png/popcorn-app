@@ -7,6 +7,7 @@ import Link from 'next/link';
 import movieTrailer from 'movie-trailer';
 import { account, databases, ID, Query, DATABASE_ID, COLLECTION_ID_MYLIST } from '@/app/appwrite';
 import { useLocale, useTranslations } from 'next-intl'; // 1. استيراد هوكات اللغة
+import { useRouter } from 'next/navigation';
 // ... (نفس الواجهات Interfaces السابقة) ...
 interface Cast { id: number; name: string; profile_path: string; character: string; }
 interface Episode { id: number; name: string; episode_number: number; still_path: string; overview: string; vote_average: number; }
@@ -135,8 +136,10 @@ useEffect(() => {
     checkFavoriteStatus();
   }, [id]);
 
+const router = useRouter();
+
   const toggleFavorite = async () => {
-    if (!currentUser) { alert("يجب تسجيل الدخول!"); return; }
+    if (!currentUser) { router.replace('/login'); return; }
     try {
       if (favDocId) {
         await databases.deleteDocument(DATABASE_ID, COLLECTION_ID_MYLIST, favDocId);
@@ -169,7 +172,7 @@ useEffect(() => {
     <div className="min-h-screen bg-[#141414] text-white pb-20">
       
       {/* القسم العلوي */}
-      <div className="relative w-full h-[85vh]">
+      <div className="relative w-full h-[70vh] md:h-[85vh]">
         <div className="absolute inset-0">
             <img 
                 src={`https://image.tmdb.org/t/p/original${movie.backdrop_path || movie.poster_path}`} 
@@ -177,18 +180,17 @@ useEffect(() => {
                 className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#141414] via-[#141414]/40 to-transparent" />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#141414] via-transparent to-transparent" />
+            <div className="absolute inset-0 ltr:bg-gradient-to-r rtl:bg-gradient-to-l from-[#141414] via-[#141414]/60 to-transparent" />
         </div>
 
         {trailerUrl && (
-            <div className="hidden lg:block absolute bottom-20 start-10 w-[450px] aspect-video rounded-xl overflow-hidden shadow-2xl z-30 group border-2 border-[#FFD700]/20">
+            <div className="hidden lg:block absolute bottom-40 end-10 md:w-[300px] lg:w-[430px] xl:w-[550px] aspect-video rounded-xl overflow-hidden shadow-2xl z-30 group border-2 border-[#FFD700]/20 transition-all duration-300">
                  <YouTube videoId={trailerUrl} opts={{ width: '100%', height: '100%' }} className="w-full h-full" />
             </div>
         )}
 
         {/* النصوص والأزرار: استخدمنا start/end و text-start للدعم الآلي */}
-        <div className="absolute bottom-0 end-0 w-full md:w-[60%] p-6 md:p-12 z-20 flex flex-col items-start text-start">
-            
+        <div className="absolute md:bottom-15 bottom-10 start-0 w-full md:w-[70%] lg:w-[60%] xl:w-[60%] p-6 md:p-12 z-20 flex flex-col items-start text-start">            
             <h1 className="text-4xl md:text-6xl font-black mb-4 drop-shadow-2xl text-white leading-tight">
                 {displayTitle}
             </h1>
@@ -224,14 +226,7 @@ useEffect(() => {
                 </button>
             </div>
 
-             <div className="flex gap-4 mt-8">
-                <button onClick={toggleLike} className={`p-3 rounded-full transition ${liked ? 'bg-white text-black' : 'bg-black/50 text-white'}`}>
-                     {liked ? <LikeIconSolid /> : <LikeIconOutline />}
-                </button>
-                <button onClick={toggleDislike} className={`p-3 rounded-full transition ${disliked ? 'bg-white text-black' : 'bg-black/50 text-white'}`}>
-                     {disliked ? <DislikeIconSolid /> : <DislikeIconOutline />}
-                </button>
-            </div>
+
         </div>
       </div>
 

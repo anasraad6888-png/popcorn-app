@@ -25,7 +25,8 @@
     "horror": "Horror Movies",
     "romance": "Romance Movies",
     "documentaries": "Documentaries",
-    "browse_all": "Browse All"
+    "browse_all": "Browse All",
+    "padding" : "pl"
   },
 "Watch": {
     "story": "Storyline",
@@ -49,7 +50,8 @@
     "anime": "Anime",
     "favorites": "My List",
     "settings": "Settings",
-    "logout": "Log Out"
+    "logout": "Log Out",
+    "login": "Login required"
   },
   "Favorites": {
     "title": "My List",
@@ -91,6 +93,8 @@
     "existing_user": "Already have an account?",
     "login_link": "Sign In",
     "signup_error": "Signup Error: ",
+    "confirm_password_placeholder" : "Confirm Password",
+    "password_match_error": "The password does not match",
     "errors": {
       "name_invalid": "Name must contain at least one character",
       "email_invalid": "Please enter a valid email address",

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { account, storage } from '../app/appwrite'; // 👈 1. تأكد من استيراد storage
 import { useTranslations, useLocale } from 'next-intl';
+import { useSidebar } from "@/app/context/SidebarContext";
 
 interface SearchResult {
   id: number;
@@ -20,6 +21,7 @@ const Navbar = () => {
   const locale = useLocale(); 
   const router = useRouter();
   const pathname = usePathname();
+  const { isVisible: isSidebarVisible } = useSidebar();
 
   // نفس الـ Bucket ID المستخدم في صفحة الإعدادات
   const BUCKET_ID = '696a3bb00027ac5ddf45'; // 👈 2. تأكد أن هذا هو الرقم الصحيح
@@ -112,7 +114,15 @@ const Navbar = () => {
   };
 
   return (
-    <nav className={`fixed top-0 start-0 w-full z-40 transition-all duration-300 p-4 md:py-4 md:ps-20 md:pe-8 ${show ? 'bg-[#141414]' : 'bg-gradient-to-b from-black/80 to-transparent'}`}>
+<nav 
+        className={`
+            fixed top-0 start-0 w-full z-40 
+            transition-all duration-500 ease-in-out 
+            p-4 md:py-4 md:pe-8 
+            ${isSidebarVisible ? 'md:ps-16' : 'md:ps-4'} 
+            ${show ? 'bg-[#141414]' : 'bg-gradient-to-b from-black/80 to-transparent'}
+        `}
+    >      
       <div className="flex items-center justify-between gap-4">
         
         {/* اللوجو */}
@@ -124,8 +134,8 @@ const Navbar = () => {
             
             <ul className="hidden md:flex gap-6 text-gray-300 text-sm font-medium">
                 <Link href="/"><li className="hover:text-[#FFD700] cursor-pointer transition">{t('home')}</li></Link>
-                <li className="hover:text-[#FFD700] cursor-pointer transition">{t('movies')}</li>
-                <li className="hover:text-[#FFD700] cursor-pointer transition">{t('series')}</li>
+                <Link href="/search/movie"><li className="hover:text-[#FFD700] cursor-pointer transition">{t('movies')}</li></Link>
+                <Link href="/search/series"><li className="hover:text-[#FFD700] cursor-pointer transition">{t('series')}</li></Link>
             </ul>
         </div>
 

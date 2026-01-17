@@ -26,7 +26,8 @@
     "horror": "رعب",
     "romance": "رومانسية",
     "documentaries": "وثائقيات",
-    "browse_all": "تصفح الكل"
+    "browse_all": "تصفح الكل",
+    "padding" : "pr"
   },
   "Watch": {
     "story": "قصة العمل",
@@ -50,7 +51,8 @@
     "anime": "أنمي",
     "favorites": "المفضلة",
     "settings": "الإعدادات",
-    "logout": "تسجيل الخروج"
+    "logout": "تسجيل الخروج",
+    "login": "يجب تسجيل الدخول"
   },
   "Favorites": {
     "title": "قائمتي",
@@ -92,6 +94,8 @@
     "existing_user": "لديك حساب بالفعل؟",
     "login_link": "تسجيل الدخول",
     "signup_error": "خطأ في إنشاء الحساب: ",
+    "confirm_password_placeholder" : "تأكيد كلمة المرور",
+    "password_match_error": "كلمة المرور غير متطابقة",
     "errors": {
       "name_invalid": "يجب أن يحتوي الاسم على حرف واحد على الأقل",
       "email_invalid": "البريد الإلكتروني غير صالح",

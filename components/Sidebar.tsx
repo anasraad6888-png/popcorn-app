@@ -1,14 +1,21 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { account } from "@/app/appwrite"; 
 import { useTranslations } from 'next-intl';
-
+import { useSidebar } from "@/app/context/SidebarContext";
 const Sidebar = () => {
   const t = useTranslations('Sidebar');
-const menuItems = [
+  const router = useRouter();
+  const [user, setUser] = React.useState<any>(null);
+  
+  // 1. حالة للتحكم في الظهور
+  const {isVisible, setIsVisible} = useSidebar();
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const menuItems = [
     { name: t('home'), icon: <HomeIcon />, link: "/" },
     { name: t('trending'), icon: <FireIcon />, link: "/search/trending" },
     { name: t('movies'), icon: <FilmIcon />, link: "/search/movie" },
@@ -17,9 +24,27 @@ const menuItems = [
     { name: t('favorites'), icon: <HeartIcon />, link: "/favorites" },
     { name: t('settings'), icon: <CogIcon />, link: "/settings" },
   ];
-  
-  const router = useRouter();
-  const [user, setUser] = useState<any>(null);
+
+  // 2. منطق حركة الماوس والمؤقت
+  useEffect(() => {
+    const handleMouseMove = () => {
+      setIsVisible(true);
+
+      // إعادة تعيين المؤقت عند كل حركة
+      if (timerRef.current) clearTimeout(timerRef.current);
+      
+      timerRef.current = setTimeout(() => {
+        setIsVisible(false);
+      }, 5000); // يختفي بعد 5 ثواني
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     const checkUser = async () => {
@@ -43,50 +68,67 @@ const menuItems = [
   };
 
   return (
-    // التعديل هنا:
-    // 1. shrink-0: يمنع السايد بار من تغيير حجمه مهما كان محتوى الصفحة ثقيلاً
-    // 2. w-full: للموبايل ليملأ الشاشة من الأسفل
-    // 3. md:w-20: للكمبيوتر ليظل نحيفاً
-    <div className="fixed bottom-0 left-0 right-0 z-50 w-full h-16 bg-[#0c0c0c] border-t border-gray-800 flex flex-row justify-around items-center py-0 shrink-0
-                    md:sticky md:top-0 md:h-screen md:w-14 md:flex-col md:justify-between md:border-t-0 md:border-l md:py-8">
+    // التعديلات هنا:
+    // - نستخدم transition-all duration-500 ease-in-out للنعومة
+    // - في الموبايل: نستخدم translate-y لإخفاءه للأسفل
+    // - في الكمبيوتر: نغير العرض (w-0 إلى w-14) لعمل إزاحة للمحتوى (Displacement)
+    // - overflow-hidden: ضروري جداً لكي لا يظهر المحتوى عندما يكون العرض 0
+<div 
+      className={`
+        {/* 👇 1. حذفنا overflow-hidden من هنا */}
+        fixed bottom-0 left-0 right-0 z-50 bg-[#0c0c0c] border-t border-gray-800 flex flex-row justify-around items-center py-0 shrink-0
+        transition-all duration-500 ease-in-out
+        
+        md:fixed md:top-0 md:start-0 md:h-screen md:flex-col md:justify-between md:border-t-0 md:border-l md:py-8
+        
+        {/* 👇 2. التحكم الذكي في الـ overflow */}
+        {/* في الموبايل أو عند الإغلاق: مخفي. في الكمبيوتر عند الفتح: مرئي للسماح بظهور التلميحات */}
+        ${isVisible ? 'md:overflow-visible overflow-hidden' : 'overflow-hidden'}
+
+        {/* باقي الكلاسات كما هي */}
+        ${isVisible ? 'h-16 translate-y-0 opacity-100' : 'h-0 translate-y-full opacity-0 md:translate-y-0 md:h-screen'}
+        ${isVisible ? 'md:w-14 opacity-100' : 'md:w-0 opacity-0'}
+      `}
+    >
       
       {/* 1. القائمة العلوية */}
       <div className="flex flex-row w-full justify-around items-center md:flex-col md:gap-5">
-        {menuItems.map((item, index) => (
-<Link href={item.link} key={index} className="relative group w-auto md:w-full flex justify-center">
-            
-            {/* الأيقونة */}
-            <div className="p-2 md:p-3 rounded-xl text-gray-400 group-hover:text-white group-hover:bg-gray-800 transition-all duration-300">
-              <div className="[&>svg]:w-6 [&>svg]:h-6 md:[&>svg]:w-7 md:[&>svg]:h-7">
-                {item.icon}
+        {menuItems.map((item, index) => {
+          
+          // 👇 المنطق الجديد:
+          // نحدد الصفحات التي تتطلب تسجيل دخول
+          const protectedRoutes = ['/settings'];
+          
+          // إذا كانت الصفحة محمية والمستخدم غير مسجل، نغير الرابط إلى /login
+          const destination = (protectedRoutes.includes(item.link) && !user) 
+            ? "/login" 
+            : item.link;
+
+          return (
+            <Link href={destination} key={index} className="relative group w-auto md:w-full flex justify-center">
+              
+              {/* الأيقونة */}
+              <div className="p-2 md:p-3 rounded-xl text-gray-400 group-hover:text-[#FFD700] transition-all duration-300">
+                <div className="[&>svg]:w-6 [&>svg]:h-6 md:[&>svg]:w-7 md:[&>svg]:h-7">
+                  {item.icon}
+                </div>
               </div>
-            </div>
 
-            {/* التلميح (Tooltip) المصحح */}
-            <span className="hidden md:block absolute top-1/2 -translate-y-1/2 bg-white text-black text-xs font-bold px-3 py-1.5 rounded opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-[0_0_10px_rgba(255,255,255,0.3)] whitespace-nowrap pointer-events-none z-50
-              
-              /* 1. تحديد الموقع: في العربي يمين، في الانجليزي يسار (ليظهر جانب الايقونة) */
-              ltr:left-[120%] rtl:right-[120%] 
-              
-              /* 2. اتجاه الحركة (Animation) */
-              ltr:-translate-x-2 rtl:translate-x-2 
-              group-hover:translate-x-0">
-              
-              {item.name}
-              
-              {/* 3. السهم الصغير (Triangle) */}
-              <span className="absolute top-1/2 -translate-y-1/2 border-4 border-transparent 
-                
-                /* في الانجليزي: السهم على اليسار ويشير لليمين */
-                ltr:-left-1 ltr:border-r-white
-                
-                /* في العربي: السهم على اليمين ويشير لليسار */
-                rtl:-right-1 rtl:border-l-white
-              "></span>
-            </span>
+              {/* التلميح (Tooltip) */}
+              <span className="hidden md:block absolute top-1/2 -translate-y-1/2 bg-white text-black text-xs font-bold px-3 py-1.5 rounded opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-[0_0_10px_rgba(255,255,255,0.3)] whitespace-nowrap pointer-events-none z-50 ltr:left-[120%] rtl:right-[120%] ltr:-translate-x-2 rtl:translate-x-2 group-hover:translate-x-0">
+                {item.name}
+                {/* إضافة ملاحظة صغيرة في التلميح إذا لم يكن مسجلاً (اختياري) */}
+                {!user && protectedRoutes.includes(item.link) && (
+                    <span className="block text-[10px] text-red-500 font-normal">
+                        ({t('login') || 'Login required'})
+                    </span>
+                )}
+                <span className="absolute top-1/2 -translate-y-1/2 border-4 border-transparent ltr:-left-1 ltr:border-r-white rtl:-right-1 rtl:border-l-white"></span>
+              </span>
 
-          </Link>
-        ))}
+            </Link>
+          );
+        })}
       </div>
 
       {/* 2. زر تسجيل الخروج */}
@@ -96,7 +138,8 @@ const menuItems = [
             disabled={!user} 
             className={`relative group w-full flex justify-center transition-all duration-300 ${!user ? 'opacity-30 cursor-not-allowed' : ''}`}
          >
-            <div className={`p-3 rounded-xl transition-all duration-300 ${user ? 'text-red-600 hover:bg-red-600/10' : 'text-gray-500'}`}>
+            {/* أيقونة الخروج: أيضاً تصبح صفراء عند التحويم */}
+            <div className={`p-3 rounded-xl transition-all duration-300 ${user ? 'text-red-600 hover:bg-red-600/10 hover:text-red-500' : 'text-gray-500'}`}>
               <LogoutIcon />
             </div>
 
@@ -115,7 +158,7 @@ const menuItems = [
 
 export default Sidebar;
 
-// (احتفظ بنفس الأيقونات في الأسفل كما هي في ملفك الأصلي)
+// الأيقونات (بقيت كما هي)
 const LogoutIcon = () => (<svg fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" /></svg>);
 const HomeIcon = () => (<svg fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>);
 const FireIcon = () => (<svg fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M15.362 5.214A8.252 8.252 0 0 1 12 21 8.25 8.25 0 0 1 6.038 7.047 8.287 8.287 0 0 0 9 9.601a8.983 8.983 0 0 1 3.361-6.867 8.21 8.21 0 0 0 3 2.48Z" /><path strokeLinecap="round" strokeLinejoin="round" d="M12 18a3.75 3.75 0 0 0 .495-7.468 5.99 5.99 0 0 0-1.925 3.547 5.975 5.975 0 0 1-2.133-1.001A3.75 3.75 0 0 0 12 18Z" /></svg>);

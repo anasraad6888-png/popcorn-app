@@ -91,7 +91,7 @@ const FavoritesPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#141414] text-white p-6 md:p-12 pl-4 md:pl-20 md:pt-20 pt-24">
+    <div className="min-h-screen bg-[#141414] text-white p-6 md:p-12 pl-4 md:pl-20 md:pt-24 pt-24">
        
        {/* العنوان */}
        <div className="flex items-end gap-4 mb-10 border-b border-gray-800 pb-4">

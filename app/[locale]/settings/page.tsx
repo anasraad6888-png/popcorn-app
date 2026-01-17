@@ -28,7 +28,7 @@ export default function SettingsPage() {
   const [isDeleting, setIsDeleting] = useState(false); // حالة تحميل خاصة بزر الحذف النهائي
 
   // 1. جلب البيانات
-  useEffect(() => {
+useEffect(() => {
     const getData = async () => {
       try {
         const currentUser = await account.get();
@@ -40,7 +40,8 @@ export default function SettingsPage() {
              setAvatarUrl(filePreview.toString());
         }
       } catch (error) {
-        // ...
+        // 🚨 هنا الحل: إذا فشل جلب المستخدم (يعني غير مسجل دخول)، نطرده فوراً
+        router.replace('/login'); 
       } finally {
         setLoading(false);
       }
@@ -152,7 +153,6 @@ export default function SettingsPage() {
 
       } catch (error: any) {
          console.error(error);
-         alert(t('error_update')); // هنا يمكن إبقاء alert للخطأ فقط أو استبداله برسالة
          setIsDeleting(false);
          setShowDeleteModal(false); // إغلاق النافذة
       }
@@ -165,11 +165,10 @@ export default function SettingsPage() {
     } catch (error) { console.error(error); }
   };
 
-  if (loading) return <div className="min-h-screen bg-[#141414] flex items-center justify-center text-white">{t('loading')}</div>;
-
+if (loading) return <div className="min-h-screen bg-[#141414] flex items-center justify-center text-white">{t('loading')}</div>;
+if (!user) return null;
   return (
-    <div className="min-h-screen bg-[#141414] text-white p-6 md:p-12 md:ps-24 pt-24 md:pt-20 relative">
-      
+<div className="min-h-screen bg-[#141414] text-white p-6 md:p-12 md:ps-14 pt-20 md:pt-24 relative">      
        <div className="flex items-end gap-4 mb-10 border-b border-gray-800 pb-4">
           <h1 className="text-3xl md:text-4xl font-bold flex items-center gap-3">
              <span className="w-2 h-10 bg-[#FFD700] rounded-full shadow-[0_0_15px_#FFD700]"></span>
